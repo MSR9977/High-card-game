@@ -177,13 +177,13 @@
       justify-content: center;
       align-items: center;
       gap: 10px;
-      min-height: 150px;
+      min-height: 120px;
       margin: 20px 0;
     }
 
     .card {
-      width: 90px;
-      height: 130px;
+      width: 70px;
+      height: 100px;
       background: white;
       border-radius: 8px;
       overflow: hidden;
@@ -618,8 +618,8 @@
         cardEl.className = 'card dealer-deal';
         cardEl.style.animationDelay = `${index * 0.1}s`;
         cardEl.innerHTML = `<div style="background: white; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; border-radius: 8px;">
-          <div style="text-align: center; color: black; font-size: 26px; font-weight: bold;">
-            ${card[0]}<br><span style="font-size: 16px;">${card[2]}</span>
+          <div style="text-align: center; color: black; font-size: 20px; font-weight: bold;">
+            ${card[0]}<br><span style="font-size: 12px;">${card[2]}</span>
           </div>
         </div>`;
         container.appendChild(cardEl);
