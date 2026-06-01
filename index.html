@@ -8,6 +8,111 @@
   >
   <title>High Card Game</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @keyframes flipCard {
+      0% {
+        transform: rotateY(0deg) scale(1);
+        opacity: 1;
+      }
+      50% {
+        transform: rotateY(90deg) scale(1.05);
+        opacity: 0.7;
+      }
+      100% {
+        transform: rotateY(0deg) scale(1);
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideInRight {
+      0% {
+        transform: translateX(-30px);
+        opacity: 0;
+      }
+      100% {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideInLeft {
+      0% {
+        transform: translateX(30px);
+        opacity: 0;
+      }
+      100% {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes pulse-glow {
+      0%, 100% {
+        box-shadow: 0 0 10px rgba(34, 197, 94, 0);
+      }
+      50% {
+        box-shadow: 0 0 30px rgba(34, 197, 94, 0.8);
+      }
+    }
+
+    @keyframes bounce-card {
+      0%, 100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-10px);
+      }
+    }
+
+    @keyframes winner-pulse {
+      0%, 100% {
+        color: #4ade80;
+        text-shadow: 0 0 10px rgba(74, 222, 128, 0.5);
+      }
+      50% {
+        color: #22c55e;
+        text-shadow: 0 0 20px rgba(74, 222, 128, 0.8);
+      }
+    }
+
+    .card-flip {
+      animation: flipCard 0.6s ease-in-out;
+      perspective: 1000px;
+    }
+
+    .slide-right {
+      animation: slideInRight 0.5s ease-out;
+    }
+
+    .slide-left {
+      animation: slideInLeft 0.5s ease-out;
+    }
+
+    .winner-text {
+      animation: winner-pulse 0.8s ease-in-out;
+    }
+
+    .bounce {
+      animation: bounce-card 0.4s ease-in-out;
+    }
+
+    .card-container {
+      transition: all 0.3s ease;
+      perspective: 1000px;
+    }
+
+    .card-container:hover {
+      transform: scale(1.02);
+    }
+
+    img.card-image {
+      transition: opacity 0.3s ease;
+    }
+
+    .score-update {
+      animation: pulse-glow 0.6s ease-in-out;
+    }
+  </style>
 </head>
 <body class="bg-slate-900 text-white overflow-x-hidden">
   <div
@@ -22,7 +127,7 @@
       class="flex flex-row flex-wrap justify-center gap-4 md:gap-8 mb-8 w-full"
     >
       <div
-        class="bg-slate-800 p-4 rounded-2xl w-[45%] max-w-[260px] text-center shadow-2xl"
+        class="bg-slate-800 p-4 rounded-2xl w-[45%] max-w-[260px] text-center shadow-2xl card-container"
       >
         <h2 class="text-xl md:text-2xl font-bold mb-4">
           Player 1
@@ -31,18 +136,18 @@
           <img
             id="player1-card"
             src="./assets/back.png"
-            class="w-full rounded-xl"
+            class="w-full rounded-xl card-image"
           >
         </div>
         <p
           id="player1-name"
-          class="mt-4 text-sm md:text-lg font-semibold"
+          class="mt-4 text-sm md:text-lg font-semibold slide-right"
         >
           Hidden Card
         </p>
       </div>
       <div
-        class="bg-slate-800 p-4 rounded-2xl w-[45%] max-w-[260px] text-center shadow-2xl"
+        class="bg-slate-800 p-4 rounded-2xl w-[45%] max-w-[260px] text-center shadow-2xl card-container"
       >
         <h2 class="text-xl md:text-2xl font-bold mb-4">
           Player 2
@@ -51,12 +156,12 @@
           <img
             id="player2-card"
             src="./assets/back.png"
-            class="w-full rounded-xl"
+            class="w-full rounded-xl card-image"
           >
         </div>
         <p
           id="player2-name"
-          class="mt-4 text-sm md:text-lg font-semibold"
+          class="mt-4 text-sm md:text-lg font-semibold slide-left"
         >
           Hidden Card
         </p>
@@ -98,13 +203,13 @@
     >
       <button
         onclick="drawCards()"
-        class="bg-blue-500 hover:bg-blue-600 px-6 py-3 rounded-xl font-bold text-sm md:text-lg"
+        class="bg-blue-500 hover:bg-blue-600 px-6 py-3 rounded-xl font-bold text-sm md:text-lg transition-all hover:scale-105 active:scale-95"
       >
         Draw Cards
       </button>
       <button
         onclick="resetGame()"
-        class="bg-red-500 hover:bg-red-600 px-6 py-3 rounded-xl font-bold text-sm md:text-lg"
+        class="bg-red-500 hover:bg-red-600 px-6 py-3 rounded-xl font-bold text-sm md:text-lg transition-all hover:scale-105 active:scale-95"
       >
         Reset
       </button>
@@ -179,78 +284,109 @@
     let player2Score = 0
 
     function randomCard() {
-
       return cards[
         Math.floor(Math.random() * cards.length)
       ]
     }
 
-    function drawCards() {
+    function addFlipAnimation(cardElement) {
+      cardElement.classList.remove('card-flip')
+      void cardElement.offsetWidth // Trigger reflow to restart animation
+      cardElement.classList.add('card-flip')
+    }
 
+    function drawCards() {
       const p1 = randomCard()
       const p2 = randomCard()
 
-      document.getElementById("player1-card").src = p1[2]
-      document.getElementById("player2-card").src = p2[2]
+      const player1CardEl = document.getElementById("player1-card")
+      const player2CardEl = document.getElementById("player2-card")
+      const player1NameEl = document.getElementById("player1-name")
+      const player2NameEl = document.getElementById("player2-name")
+      const winnerEl = document.getElementById("winner")
 
-      document.getElementById("player1-name").innerText = p1[0]
-      document.getElementById("player2-name").innerText = p2[0]
+      // Add flip animation to cards
+      addFlipAnimation(player1CardEl)
+      addFlipAnimation(player2CardEl)
 
+      // Update cards after animation
+      setTimeout(() => {
+        player1CardEl.src = p1[2]
+        player2CardEl.src = p2[2]
+      }, 300)
+
+      // Update names with animation
+      player1NameEl.classList.remove('slide-right')
+      player2NameEl.classList.remove('slide-left')
+
+      setTimeout(() => {
+        player1NameEl.innerText = p1[0]
+        player2NameEl.innerText = p2[0]
+        player1NameEl.classList.add('slide-right')
+        player2NameEl.classList.add('slide-left')
+      }, 300)
+
+      // Determine winner
+      let winnerText = ""
       if (p1[1] > p2[1]) {
-
         player1Score++
-
-        document.getElementById("winner").innerText =
-          "Player 1 Wins!"
-
-      }
-
-      else if (p2[1] > p1[1]) {
-
+        winnerText = "🎉 Player 1 Wins! 🎉"
+      } else if (p2[1] > p1[1]) {
         player2Score++
-
-        document.getElementById("winner").innerText =
-          "Player 2 Wins!"
-
+        winnerText = "🎉 Player 2 Wins! 🎉"
+      } else {
+        winnerText = "🤝 Draw! 🤝"
       }
 
-      else {
+      // Update winner text with animation
+      winnerEl.classList.remove('winner-text')
+      setTimeout(() => {
+        winnerEl.innerText = winnerText
+        winnerEl.classList.add('winner-text')
+      }, 400)
 
-        document.getElementById("winner").innerText =
-          "Draw!"
-
-      }
-
-      document.getElementById("player1-score").innerText =
-        player1Score
-
-      document.getElementById("player2-score").innerText =
-        player2Score
+      // Update scores with animation
+      setTimeout(() => {
+        const player1ScoreEl = document.getElementById("player1-score")
+        const player2ScoreEl = document.getElementById("player2-score")
+        
+        player1ScoreEl.classList.remove('score-update')
+        player2ScoreEl.classList.remove('score-update')
+        
+        void player1ScoreEl.offsetWidth
+        void player2ScoreEl.offsetWidth
+        
+        player1ScoreEl.innerText = player1Score
+        player2ScoreEl.innerText = player2Score
+        
+        player1ScoreEl.classList.add('score-update')
+        player2ScoreEl.classList.add('score-update')
+      }, 500)
     }
 
     function resetGame() {
-
       player1Score = 0
       player2Score = 0
 
-      document.getElementById("player1-card").src =
-        "./assets/back.png"
+      const player1CardEl = document.getElementById("player1-card")
+      const player2CardEl = document.getElementById("player2-card")
 
-      document.getElementById("player2-card").src =
-        "./assets/back.png"
+      // Add flip animation when resetting
+      addFlipAnimation(player1CardEl)
+      addFlipAnimation(player2CardEl)
 
-      document.getElementById("player1-name").innerText =
-        "Hidden Card"
+      setTimeout(() => {
+        player1CardEl.src = "./assets/back.png"
+        player2CardEl.src = "./assets/back.png"
 
-      document.getElementById("player2-name").innerText =
-        "Hidden Card"
+        document.getElementById("player1-name").innerText = "Hidden Card"
+        document.getElementById("player2-name").innerText = "Hidden Card"
 
-      document.getElementById("player1-score").innerText = 0
+        document.getElementById("player1-score").innerText = 0
+        document.getElementById("player2-score").innerText = 0
 
-      document.getElementById("player2-score").innerText = 0
-
-      document.getElementById("winner").innerText =
-        "Press Draw Cards"
+        document.getElementById("winner").innerText = "Press Draw Cards"
+      }, 300)
     }
 
   </script>
