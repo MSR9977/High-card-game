@@ -2,358 +2,710 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>High Card Game</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>🎯 High Card Game</title>
   <style>
-    * {
-      direction: rtl;
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Cairo:wght@400;600;700;900&display=swap');
+
+    * { margin:0; padding:0; box-sizing:border-box; direction:rtl; }
+
+    :root {
+      --gold: #f5c518;
+      --felt: #1a4d2e;
+      --felt-dark: #0d2818;
     }
 
-    @keyframes flipCard {
-      0% {
-        transform: rotateY(0deg) scale(1);
-        opacity: 1;
-      }
-      50% {
-        transform: rotateY(90deg) scale(1.05);
-        opacity: 0.7;
-      }
-      100% {
-        transform: rotateY(0deg) scale(1);
-        opacity: 1;
-      }
+    html, body {
+      height: 100%;
+      overflow: hidden;
+      font-family: 'Cairo', sans-serif;
+      background: #0a0a0a;
+      color: white;
     }
 
-    @keyframes slideInRight {
-      0% {
-        transform: translateX(-30px);
-        opacity: 0;
-      }
-      100% {
-        transform: translateX(0);
-        opacity: 1;
-      }
+    #app {
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      background: linear-gradient(160deg, #0a0f0a 0%, var(--felt-dark) 50%, #0a0f0a 100%);
+      overflow: hidden;
     }
 
-    @keyframes slideInLeft {
-      0% {
-        transform: translateX(30px);
-        opacity: 0;
-      }
-      100% {
-        transform: translateX(0);
-        opacity: 1;
-      }
+    /* ─── HEADER ─── */
+    #header {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 12px;
+      background: linear-gradient(90deg, #0d2818, #1a4d2e, #0d2818);
+      border-bottom: 2px solid var(--gold);
     }
-
-    @keyframes pulse-glow {
-      0%, 100% {
-        box-shadow: 0 0 10px rgba(34, 197, 94, 0);
-      }
-      50% {
-        box-shadow: 0 0 30px rgba(34, 197, 94, 0.8);
-      }
+    #header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(14px, 4vw, 22px);
+      color: var(--gold);
+      text-shadow: 0 0 15px rgba(245,197,24,0.6);
     }
-
-    @keyframes bounce-card {
-      0%, 100% {
-        transform: translateY(0);
-      }
-      50% {
-        transform: translateY(-10px);
-      }
-    }
-
-    @keyframes winner-pulse {
-      0%, 100% {
-        color: #4ade80;
-        text-shadow: 0 0 10px rgba(74, 222, 128, 0.5);
-      }
-      50% {
-        color: #22c55e;
-        text-shadow: 0 0 20px rgba(74, 222, 128, 0.8);
-      }
-    }
-
-    .card-flip {
-      animation: flipCard 0.6s ease-in-out;
-      perspective: 1000px;
-    }
-
-    .slide-right {
-      animation: slideInRight 0.5s ease-out;
-    }
-
-    .slide-left {
-      animation: slideInLeft 0.5s ease-out;
-    }
-
-    .winner-text {
-      animation: winner-pulse 0.8s ease-in-out;
-    }
-
-    .bounce {
-      animation: bounce-card 0.4s ease-in-out;
-    }
-
-    .card-container {
-      transition: all 0.3s ease;
-      perspective: 1000px;
-    }
-
-    .card-container:hover {
-      transform: scale(1.02);
-    }
-
-    img.card-image {
-      transition: opacity 0.3s ease;
-    }
-
-    .score-update {
-      animation: pulse-glow 0.6s ease-in-out;
-    }
-
-    .card-display-bg {
-      background: rgba(255, 255, 255, 0.95);
-      border-radius: 12px;
-      padding: 8px;
-    }
-
-    .card-display-bg img {
-      display: block;
-      width: 100%;
-      height: auto;
+    #back-btn {
+      background: rgba(0,0,0,0.4);
+      border: 1.5px solid #555;
       border-radius: 8px;
+      padding: 4px 10px;
+      color: #ccc;
+      font-size: 11px;
+      cursor: pointer;
+      text-decoration: none;
+      font-family: 'Cairo', sans-serif;
     }
+
+    /* ─── SCORE DISPLAY ─── */
+    #scoreboard {
+      flex-shrink: 0;
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      padding: 6px 12px;
+      background: rgba(0,0,0,0.4);
+      border-bottom: 1px solid rgba(245,197,24,0.2);
+    }
+    .score-pill {
+      background: rgba(0,0,0,0.6);
+      border: 1.5px solid var(--gold);
+      border-radius: 16px;
+      padding: 3px 18px;
+      text-align: center;
+      min-width: 90px;
+    }
+    .score-pill .name {
+      font-size: clamp(9px, 2.2vw, 12px);
+      color: #aaa;
+      font-weight: 600;
+    }
+    .score-pill .pts {
+      font-size: clamp(18px, 6vw, 30px);
+      font-weight: 900;
+      color: var(--gold);
+      line-height: 1;
+    }
+    #round-info {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: clamp(9px, 2vw, 12px);
+      color: #888;
+    }
+    #round-info span { color: #60a5fa; font-weight: 700; }
+
+    /* ─── ARENA ─── */
+    #arena {
+      flex: 1;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      gap: clamp(10px, 4vw, 40px);
+      padding: 8px 12px;
+      min-height: 0;
+    }
+
+    /* ─── PLAYER CARDS ─── */
+    .player-slot {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      flex: 1;
+      max-width: 200px;
+    }
+    .player-name {
+      font-size: clamp(11px, 3vw, 16px);
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: white;
+    }
+    .player-name.p1 { color: #60a5fa; }
+    .player-name.p2 { color: #f87171; }
+
+    .card-frame {
+      background: white;
+      border-radius: 10px;
+      padding: 6px;
+      box-shadow: 0 6px 24px rgba(0,0,0,0.7), 0 0 0 2px rgba(255,255,255,0.15);
+      width: clamp(90px, 28vw, 145px);
+      transition: transform 0.3s ease;
+      position: relative;
+    }
+    .card-frame img {
+      width: 100%;
+      display: block;
+      border-radius: 6px;
+    }
+    .card-frame .hidden-card {
+      width: 100%;
+      aspect-ratio: 5/7;
+      background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 50%, #1e3a8a 100%);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: clamp(28px, 12vw, 56px);
+      color: rgba(255,255,255,0.5);
+    }
+    .card-frame.winner {
+      box-shadow: 0 0 0 4px #4ade80, 0 8px 30px rgba(74,222,128,0.5);
+      animation: winnerGlow 1s ease infinite alternate;
+    }
+    .card-frame.loser {
+      box-shadow: 0 0 0 3px #ef4444, 0 4px 15px rgba(239,68,68,0.4);
+      filter: brightness(0.7);
+      animation: loserShake 0.6s ease;
+    }
+
+    @keyframes winnerGlow {
+      from { box-shadow: 0 0 0 4px #4ade80, 0 8px 30px rgba(74,222,128,0.3); }
+      to   { box-shadow: 0 0 0 6px #4ade80, 0 12px 40px rgba(74,222,128,0.7); }
+    }
+    @keyframes loserShake {
+      0%,100% { transform: rotate(0deg); }
+      20%     { transform: rotate(-3deg); }
+      40%     { transform: rotate(3deg); }
+      60%     { transform: rotate(-2deg); }
+      80%     { transform: rotate(2deg); }
+    }
+
+    @keyframes cardReveal {
+      0%   { transform: rotateY(90deg) scale(0.8); opacity: 0; }
+      60%  { transform: rotateY(-8deg) scale(1.05); opacity: 1; }
+      100% { transform: rotateY(0deg) scale(1); opacity: 1; }
+    }
+    .reveal { animation: cardReveal 0.55s cubic-bezier(0.34,1.56,0.64,1) both; }
+
+    .card-label {
+      font-size: clamp(10px, 2.5vw, 14px);
+      font-weight: 700;
+      text-align: center;
+      color: white;
+      min-height: 18px;
+      transition: opacity 0.3s;
+    }
+
+    /* ─── VS BADGE ─── */
+    #vs-badge {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+    #vs-text {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(20px, 7vw, 42px);
+      font-weight: 900;
+      color: var(--gold);
+      text-shadow: 0 0 20px rgba(245,197,24,0.6);
+      line-height: 1;
+    }
+
+    /* ─── CHIPS IN BET AREA ─── */
+    #bet-chips-area {
+      flex-shrink: 0;
+      min-height: clamp(40px, 10vw, 60px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      padding: 4px 12px;
+    }
+
+    /* ─── WIN RESULT ─── */
+    #result-banner {
+      flex-shrink: 0;
+      text-align: center;
+      font-size: clamp(13px, 4vw, 20px);
+      font-weight: 900;
+      padding: 6px 20px;
+      border-radius: 20px;
+      margin: 0 12px;
+      min-height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      border: 2px solid transparent;
+    }
+    #result-banner.idle  { color: #888; border-color: #333; background: rgba(0,0,0,0.3); }
+    #result-banner.win1  { color: #60a5fa; border-color: #60a5fa; background: rgba(96,165,250,0.15); animation: bannerPop 0.5s ease; }
+    #result-banner.win2  { color: #f87171; border-color: #f87171; background: rgba(248,113,113,0.15); animation: bannerPop 0.5s ease; }
+    #result-banner.draw  { color: var(--gold); border-color: var(--gold); background: rgba(245,197,24,0.1); animation: bannerPop 0.5s ease; }
+
+    @keyframes bannerPop {
+      0%   { transform: scale(0.85); }
+      60%  { transform: scale(1.06); }
+      100% { transform: scale(1); }
+    }
+
+    /* ─── CHIP TRAY ─── */
+    #chip-tray {
+      flex-shrink: 0;
+      display: flex;
+      justify-content: center;
+      gap: clamp(8px, 2.5vw, 18px);
+      padding: 4px 8px;
+    }
+
+    .chip {
+      width: clamp(40px, 10.5vw, 56px);
+      height: clamp(40px, 10.5vw, 56px);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: clamp(8px, 2.2vw, 12px);
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      position: relative;
+      border: 3px solid rgba(255,255,255,0.25);
+      box-shadow: 0 4px 14px rgba(0,0,0,0.6), inset 0 2px 5px rgba(255,255,255,0.2);
+      user-select: none;
+    }
+    .chip::before {
+      content: '';
+      position: absolute;
+      inset: 4px;
+      border-radius: 50%;
+      border: 1.5px dashed rgba(255,255,255,0.35);
+    }
+    .chip:hover  { transform: scale(1.12) translateY(-4px); }
+    .chip:active { transform: scale(0.93); }
+    .chip.selected { box-shadow: 0 0 0 3px white, 0 4px 14px rgba(0,0,0,0.6); transform: scale(1.1) translateY(-5px); }
+
+    .chip-5   { background: radial-gradient(circle at 35% 35%, #c084fc, #7e22ce); border-color: #a855f7; }
+    .chip-10  { background: radial-gradient(circle at 35% 35%, #6ee7b7, #047857); border-color: #10b981; }
+    .chip-25  { background: radial-gradient(circle at 35% 35%, #93c5fd, #1d4ed8); border-color: #3b82f6; }
+    .chip-50  { background: radial-gradient(circle at 35% 35%, #fcd34d, #b45309); border-color: #f59e0b; }
+    .chip-100 { background: radial-gradient(circle at 35% 35%, #fca5a5, #b91c1c); border-color: #ef4444; }
+
+    @keyframes chipFlyIn {
+      0%   { transform: scale(0) rotate(180deg) translateY(-20px); opacity: 0; }
+      60%  { transform: scale(1.2) rotate(-10deg) translateY(0); opacity: 1; }
+      100% { transform: scale(1) rotate(0deg); opacity: 1; }
+    }
+    @keyframes chipFlyOut {
+      0%   { transform: scale(1); opacity: 1; }
+      100% { transform: scale(0) rotate(360deg) translateY(-40px); opacity: 0; }
+    }
+    .chip-fly-in  { animation: chipFlyIn  0.4s cubic-bezier(0.34,1.56,0.64,1) both; }
+    .chip-fly-out { animation: chipFlyOut 0.35s ease-in both; }
+
+    /* ─── BET DISPLAY ─── */
+    #bet-info {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(0,0,0,0.4);
+      border: 1.5px dashed rgba(245,197,24,0.4);
+      border-radius: 14px;
+      padding: 3px 12px;
+    }
+    #bet-info .lbl { font-size: 9px; color: #888; }
+    #bet-info .val { font-size: clamp(12px, 3vw, 17px); font-weight: 900; color: var(--gold); }
+
+    /* ─── PLAYER BALANCES ─── */
+    #balances {
+      flex-shrink: 0;
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      padding: 2px 12px;
+    }
+    .bal-box {
+      font-size: clamp(9px, 2.2vw, 12px);
+      background: rgba(0,0,0,0.5);
+      border-radius: 10px;
+      padding: 2px 12px;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .bal-box span { font-weight: 700; color: #4ade80; }
+
+    /* ─── ACTIONS ─── */
+    #action-row {
+      flex-shrink: 0;
+      display: flex;
+      justify-content: center;
+      gap: clamp(5px, 2vw, 12px);
+      padding: 4px 8px;
+      flex-wrap: wrap;
+    }
+    .btn {
+      padding: clamp(7px,2vw,11px) clamp(12px,4vw,24px);
+      font-family: 'Cairo', sans-serif;
+      font-size: clamp(10px, 2.8vw, 14px);
+      font-weight: 700;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.4); }
+    .btn:active { transform: scale(0.94); }
+    .btn-draw  { background: linear-gradient(135deg, #22c55e, #15803d); color: white; }
+    .btn-reset { background: linear-gradient(135deg, #64748b, #334155); color: white; }
+    .btn-bet   { background: linear-gradient(135deg, #f59e0b, #b45309); color: white; }
+    .btn-clear { background: linear-gradient(135deg, #ef4444, #991b1b); color: white; }
+
+    /* ─── WIN OVERLAY ─── */
+    #win-overlay {
+      position: fixed; inset: 0;
+      pointer-events: none; z-index: 99;
+      display: none; justify-content: center; align-items: center;
+    }
+    #win-overlay.show { display: flex; }
+    .big-win {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(40px, 14vw, 90px);
+      font-weight: 900;
+      text-align: center;
+      animation: bigWinAnim 1.2s cubic-bezier(0.34,1.56,0.64,1) forwards;
+    }
+    @keyframes bigWinAnim {
+      0%   { transform: scale(0.2) rotate(-15deg); opacity: 0; }
+      50%  { transform: scale(1.15) rotate(3deg); opacity: 1; }
+      80%  { transform: scale(1); opacity: 1; }
+      100% { transform: scale(1.5); opacity: 0; }
+    }
+    .confetti {
+      position: fixed;
+      border-radius: 2px;
+      pointer-events: none;
+      animation: confettiFall var(--dur) linear forwards;
+    }
+    @keyframes confettiFall {
+      0%   { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+    }
+
+    #footer { flex-shrink:0; text-align:center; padding:3px; border-top:1px solid rgba(255,255,255,0.06); }
+    #footer a { font-size:9px; color:#555; text-decoration:none; }
   </style>
 </head>
-<body class="bg-gradient-to-b from-slate-950 to-slate-900 text-white overflow-x-hidden min-h-screen">
-  <div class="min-h-screen flex flex-col items-center justify-center p-2 sm:p-4">
-    <h1 class="text-2xl sm:text-3xl md:text-5xl font-bold mb-4 text-yellow-400 text-center animate-bounce">
-      🎰 High Card Game 🎰
-    </h1>
-    
-    <div class="flex flex-row flex-wrap justify-center gap-2 sm:gap-4 md:gap-8 mb-8 w-full">
-      <div class="bg-slate-800 p-3 sm:p-4 rounded-lg sm:rounded-2xl w-[45%] max-w-[200px] sm:max-w-[260px] text-center shadow-2xl card-container">
-        <h2 class="text-lg sm:text-xl md:text-2xl font-bold mb-3 sm:mb-4">Player 1</h2>
-        <div class="card-display-bg">
-          <img id="player1-card" src="./assets/back.png" class="rounded-lg sm:rounded-xl card-image" alt="Player 1 Card">
-        </div>
-        <p id="player1-name" class="mt-2 sm:mt-4 text-xs sm:text-sm md:text-lg font-semibold slide-right">
-          Hidden Card
-        </p>
-      </div>
-      <div class="bg-slate-800 p-3 sm:p-4 rounded-lg sm:rounded-2xl w-[45%] max-w-[200px] sm:max-w-[260px] text-center shadow-2xl card-container">
-        <h2 class="text-lg sm:text-xl md:text-2xl font-bold mb-3 sm:mb-4">Player 2</h2>
-        <div class="card-display-bg">
-          <img id="player2-card" src="./assets/back.png" class="rounded-lg sm:rounded-xl card-image" alt="Player 2 Card">
-        </div>
-        <p id="player2-name" class="mt-2 sm:mt-4 text-xs sm:text-sm md:text-lg font-semibold slide-left">
-          Hidden Card
-        </p>
-      </div>
+<body>
+<div id="app">
+
+  <!-- HEADER -->
+  <div id="header">
+    <a href="./index.html" id="back-btn">⬅ الرئيسية</a>
+    <h1>🎯 HIGH CARD</h1>
+    <div style="width:72px"></div>
+  </div>
+
+  <!-- SCOREBOARD -->
+  <div id="scoreboard">
+    <div class="score-pill">
+      <div class="name">🔵 Player 1</div>
+      <div class="pts" id="s1">0</div>
     </div>
-
-    <h2 id="winner" class="text-xl sm:text-2xl md:text-4xl font-bold mb-4 sm:mb-6 text-green-400 text-center">
-      Press Draw Cards
-    </h2>
-
-    <div class="bg-gradient-to-b from-slate-700 to-slate-800 p-4 sm:p-5 rounded-lg sm:rounded-2xl text-center w-full max-w-sm mx-auto mb-6 border-2 border-yellow-500">
-      <h3 class="text-lg sm:text-2xl md:text-3xl font-bold mb-3 sm:mb-4">Score Board</h3>
-      <p class="text-base sm:text-xl md:text-2xl mb-2">
-        Player 1: <span id="player1-score" class="text-yellow-400 font-bold">0</span>
-      </p>
-      <p class="text-base sm:text-xl md:text-2xl">
-        Player 2: <span id="player2-score" class="text-yellow-400 font-bold">0</span>
-      </p>
-      <div class="bg-black bg-opacity-50 rounded-lg p-3 mt-4">
-        <p class="text-xs sm:text-sm">🎮 Rounds: <span id="round-count">0</span></p>
-        <p class="text-xs sm:text-sm">📊 Win Rate P1: <span id="win-rate">0%</span></p>
-      </div>
+    <div id="round-info">
+      <div>جولة</div>
+      <span id="rounds">0</span>
     </div>
-
-    <div class="flex flex-wrap justify-center gap-2 sm:gap-4">
-      <button onclick="drawCards()" class="bg-blue-500 hover:bg-blue-600 px-4 sm:px-6 py-2 sm:py-3 rounded-lg sm:rounded-xl font-bold text-xs sm:text-sm md:text-lg transition-all hover:scale-105 active:scale-95">
-        Draw Cards
-      </button>
-      <button onclick="resetGame()" class="bg-red-500 hover:bg-red-600 px-4 sm:px-6 py-2 sm:py-3 rounded-lg sm:rounded-xl font-bold text-xs sm:text-sm md:text-lg transition-all hover:scale-105 active:scale-95">
-        Reset
-      </button>
+    <div class="score-pill">
+      <div class="name">🔴 Player 2</div>
+      <div class="pts" id="s2">0</div>
     </div>
   </div>
 
-  <script>
-    const cards = [
-      ["Ace of Spades", 14, "./assets/ace_of_spades.png"],
-      ["Ace of Hearts", 14, "./assets/ace_of_hearts.png"],
-      ["Ace of Clubs", 14, "./assets/ace_of_clubs.png"],
-      ["Ace of Diamonds", 14, "./assets/ace_of_diamonds.png"],
-      ["King of Spades", 13, "./assets/king_of_spades.png"],
-      ["King of Hearts", 13, "./assets/king_of_hearts.png"],
-      ["King of Clubs", 13, "./assets/king_of_clubs.png"],
-      ["King of Diamonds", 13, "./assets/king_of_diamonds.png"],
-      ["Queen of Spades", 12, "./assets/queen_of_spades.png"],
-      ["Queen of Hearts", 12, "./assets/queen_of_hearts.png"],
-      ["Queen of Clubs", 12, "./assets/queen_of_clubs.png"],
-      ["Queen of Diamonds", 12, "./assets/queen_of_diamonds.png"],
-      ["Jack of Spades", 11, "./assets/jack_of_spades.png"],
-      ["Jack of Hearts", 11, "./assets/jack_of_hearts.png"],
-      ["Jack of Clubs", 11, "./assets/jack_of_clubs.png"],
-      ["Jack of Diamonds", 11, "./assets/jack_of_diamonds.png"],
-      ["10 of Spades", 10, "./assets/10_of_spades.png"],
-      ["10 of Hearts", 10, "./assets/10_of_hearts.png"],
-      ["10 of Clubs", 10, "./assets/10_of_clubs.png"],
-      ["10 of Diamonds", 10, "./assets/10_of_diamonds.png"],
-      ["9 of Spades", 9, "./assets/9_of_spades.png"],
-      ["9 of Hearts", 9, "./assets/9_of_hearts.png"],
-      ["9 of Clubs", 9, "./assets/9_of_clubs.png"],
-      ["9 of Diamonds", 9, "./assets/9_of_diamonds.png"],
-      ["8 of Spades", 8, "./assets/8_of_spades.png"],
-      ["8 of Hearts", 8, "./assets/8_of_hearts.png"],
-      ["8 of Clubs", 8, "./assets/8_of_clubs.png"],
-      ["8 of Diamonds", 8, "./assets/8_of_diamonds.png"],
-      ["7 of Spades", 7, "./assets/7_of_spades.png"],
-      ["7 of Hearts", 7, "./assets/7_of_hearts.png"],
-      ["7 of Clubs", 7, "./assets/7_of_clubs.png"],
-      ["7 of Diamonds", 7, "./assets/7_of_diamonds.png"],
-      ["6 of Spades", 6, "./assets/6_of_spades.png"],
-      ["6 of Hearts", 6, "./assets/6_of_hearts.png"],
-      ["6 of Clubs", 6, "./assets/6_of_clubs.png"],
-      ["6 of Diamonds", 6, "./assets/6_of_diamonds.png"],
-      ["5 of Spades", 5, "./assets/5_of_spades.png"],
-      ["5 of Hearts", 5, "./assets/5_of_hearts.png"],
-      ["5 of Clubs", 5, "./assets/5_of_clubs.png"],
-      ["5 of Diamonds", 5, "./assets/5_of_diamonds.png"],
-      ["4 of Spades", 4, "./assets/4_of_spades.png"],
-      ["4 of Hearts", 4, "./assets/4_of_hearts.png"],
-      ["4 of Clubs", 4, "./assets/4_of_clubs.png"],
-      ["4 of Diamonds", 4, "./assets/4_of_diamonds.png"],
-      ["3 of Spades", 3, "./assets/3_of_spades.png"],
-      ["3 of Hearts", 3, "./assets/3_of_hearts.png"],
-      ["3 of Clubs", 3, "./assets/3_of_clubs.png"],
-      ["3 of Diamonds", 3, "./assets/3_of_diamonds.png"],
-      ["2 of Spades", 2, "./assets/2_of_spades.png"],
-      ["2 of Hearts", 2, "./assets/2_of_hearts.png"],
-      ["2 of Clubs", 2, "./assets/2_of_clubs.png"],
-      ["2 of Diamonds", 2, "./assets/2_of_diamonds.png"]
-    ];
+  <!-- ARENA -->
+  <div id="arena">
+    <!-- Player 1 -->
+    <div class="player-slot">
+      <div class="player-name p1">🔵 Player 1</div>
+      <div class="card-frame" id="frame1">
+        <div class="hidden-card">🂠</div>
+      </div>
+      <div class="card-label" id="label1">—</div>
+      <div class="bal-box">رصيد: <span id="bal1">$500</span></div>
+    </div>
 
-    let player1Score = 0;
-    let player2Score = 0;
-    let roundCount = 0;
+    <!-- VS -->
+    <div id="vs-badge">
+      <div id="vs-text">VS</div>
+    </div>
 
-    function randomCard() {
-      return cards[Math.floor(Math.random() * cards.length)];
-    }
+    <!-- Player 2 -->
+    <div class="player-slot">
+      <div class="player-name p2">🔴 Player 2</div>
+      <div class="card-frame" id="frame2">
+        <div class="hidden-card">🂠</div>
+      </div>
+      <div class="card-label" id="label2">—</div>
+      <div class="bal-box">رصيد: <span id="bal2">$500</span></div>
+    </div>
+  </div>
 
-    function addFlipAnimation(cardElement) {
-      cardElement.classList.remove('card-flip');
-      void cardElement.offsetWidth;
-      cardElement.classList.add('card-flip');
-    }
+  <!-- RESULT BANNER -->
+  <div id="result-banner" class="idle">اضغط Draw Cards للعب!</div>
 
-    function updateStats() {
-      document.getElementById('round-count').innerText = roundCount;
-      const winRate = roundCount > 0 ? Math.round((player1Score / roundCount) * 100) : 0;
-      document.getElementById('win-rate').innerText = winRate + '%';
-    }
+  <!-- BET CHIPS AREA -->
+  <div id="bet-chips-area">
+    <div id="bet-info">
+      <span class="lbl">الرهان:</span>
+      <span class="val" id="bet-val">$0</span>
+    </div>
+    <div id="placed-chips" style="display:flex;gap:5px;flex-wrap:wrap;align-items:center"></div>
+  </div>
 
-    function drawCards() {
-      const p1 = randomCard();
-      const p2 = randomCard();
+  <!-- CHIP TRAY -->
+  <div id="chip-tray">
+    <div class="chip chip-5"   onclick="addBet(5,'chip-5')">$5</div>
+    <div class="chip chip-10"  onclick="addBet(10,'chip-10')">$10</div>
+    <div class="chip chip-25"  onclick="addBet(25,'chip-25')">$25</div>
+    <div class="chip chip-50"  onclick="addBet(50,'chip-50')">$50</div>
+    <div class="chip chip-100" onclick="addBet(100,'chip-100')">$100</div>
+  </div>
 
-      const player1CardEl = document.getElementById("player1-card");
-      const player2CardEl = document.getElementById("player2-card");
-      const player1NameEl = document.getElementById("player1-name");
-      const player2NameEl = document.getElementById("player2-name");
-      const winnerEl = document.getElementById("winner");
+  <!-- ACTIONS -->
+  <div id="action-row">
+    <button class="btn btn-draw"  onclick="drawCards()">🎴 Draw Cards</button>
+    <button class="btn btn-clear" onclick="clearBet()">🗑 مسح الرهان</button>
+    <button class="btn btn-reset" onclick="resetGame()">🔄 Reset</button>
+  </div>
 
-      addFlipAnimation(player1CardEl);
-      addFlipAnimation(player2CardEl);
+  <div id="footer"><a href="./index.html">Casino Games Pro © 2026</a></div>
+</div>
 
-      setTimeout(() => {
-        player1CardEl.src = p1[2];
-        player2CardEl.src = p2[2];
-      }, 300);
+<!-- WIN OVERLAY -->
+<div id="win-overlay"><div class="big-win" id="big-win-text"></div></div>
 
-      player1NameEl.classList.remove('slide-right');
-      player2NameEl.classList.remove('slide-left');
+<script>
+// ── CARDS ──
+const SUITS = ['spades','hearts','clubs','diamonds'];
+const RANKS = [
+  ['2',2],['3',3],['4',4],['5',5],['6',6],['7',7],['8',8],['9',9],['10',10],
+  ['jack',11],['queen',12],['king',13],['ace',14]
+];
+const DISPLAY = { '2':'2','3':'3','4':'4','5':'5','6':'6','7':'7','8':'8','9':'9','10':'10','jack':'Jack','queen':'Queen','king':'King','ace':'Ace' };
+const SUIT_EMOJI = { spades:'♠️', hearts:'♥️', clubs:'♣️', diamonds:'♦️' };
 
-      setTimeout(() => {
-        player1NameEl.innerText = p1[0];
-        player2NameEl.innerText = p2[0];
-        player1NameEl.classList.add('slide-right');
-        player2NameEl.classList.add('slide-left');
-      }, 300);
+function buildDeck() {
+  const deck = [];
+  SUITS.forEach(suit => {
+    RANKS.forEach(([rank, val]) => {
+      const name = ['jack','queen','king','ace'].includes(rank)
+        ? `${rank}_of_${suit}`
+        : `${rank}_of_${suit}`;
+      deck.push({
+        img: `./assets/${name}.png`,
+        val,
+        label: `${DISPLAY[rank]} ${SUIT_EMOJI[suit]}`,
+        rank, suit
+      });
+    });
+  });
+  return deck;
+}
 
-      let winnerText = "";
-      if (p1[1] > p2[1]) {
-        player1Score++;
-        winnerText = "🎉 Player 1 Wins! 🎉";
-      } else if (p2[1] > p1[1]) {
-        player2Score++;
-        winnerText = "🎉 Player 2 Wins! 🎉";
-      } else {
-        winnerText = "🤝 Draw! 🤝";
-      }
+function shuffle(arr) {
+  for (let i = arr.length-1; i > 0; i--) {
+    const j = Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]] = [arr[j],arr[i]];
+  }
+}
 
-      roundCount++;
+// ── STATE ──
+let state = {
+  deck: [], score1: 0, score2: 0, rounds: 0,
+  bal1: 500, bal2: 500, currentBet: 0, lastChipClass: 'chip-25',
+  playing: false
+};
 
-      winnerEl.classList.remove('winner-text');
-      setTimeout(() => {
-        winnerEl.innerText = winnerText;
-        winnerEl.classList.add('winner-text');
-      }, 400);
+function initDeck() {
+  state.deck = [...buildDeck(),...buildDeck()];
+  shuffle(state.deck);
+}
 
-      setTimeout(() => {
-        const player1ScoreEl = document.getElementById("player1-score");
-        const player2ScoreEl = document.getElementById("player2-score");
-        
-        player1ScoreEl.classList.remove('score-update');
-        player2ScoreEl.classList.remove('score-update');
-        
-        void player1ScoreEl.offsetWidth;
-        void player2ScoreEl.offsetWidth;
-        
-        player1ScoreEl.innerText = player1Score;
-        player2ScoreEl.innerText = player2Score;
-        
-        player1ScoreEl.classList.add('score-update');
-        player2ScoreEl.classList.add('score-update');
-        
-        updateStats();
-      }, 500);
-    }
+function deal() {
+  if (state.deck.length < 5) initDeck();
+  return state.deck.pop();
+}
 
-    function resetGame() {
-      player1Score = 0;
-      player2Score = 0;
-      roundCount = 0;
+// ── BET ──
+function addBet(val, cls) {
+  if (state.playing) return;
+  state.lastChipClass = cls;
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
+  document.querySelector(`.${cls}`).classList.add('selected');
 
-      const player1CardEl = document.getElementById("player1-card");
-      const player2CardEl = document.getElementById("player2-card");
+  const maxAdd = Math.min(val, state.bal1, state.bal2);
+  if (maxAdd <= 0) return;
+  state.currentBet += maxAdd;
+  updateBetDisplay();
 
-      addFlipAnimation(player1CardEl);
-      addFlipAnimation(player2CardEl);
+  // Animate chip into bet area
+  const placed = document.getElementById('placed-chips');
+  const c = document.createElement('div');
+  c.className = `chip ${cls} chip-fly-in`;
+  c.style.cssText = `width:28px;height:28px;font-size:8px;border-width:2px;flex-shrink:0`;
+  c.textContent = `$${maxAdd}`;
+  placed.appendChild(c);
+}
 
-      setTimeout(() => {
-        player1CardEl.src = "./assets/back.png";
-        player2CardEl.src = "./assets/back.png";
+function clearBet() {
+  if (state.playing) return;
+  state.currentBet = 0;
+  updateBetDisplay();
+  const placed = document.getElementById('placed-chips');
+  placed.querySelectorAll('.chip').forEach(c => {
+    c.className += ' chip-fly-out';
+    setTimeout(() => c.remove(), 340);
+  });
+}
 
-        document.getElementById("player1-name").innerText = "Hidden Card";
-        document.getElementById("player2-name").innerText = "Hidden Card";
+function updateBetDisplay() {
+  document.getElementById('bet-val').textContent = `$${state.currentBet}`;
+}
 
-        document.getElementById("player1-score").innerText = 0;
-        document.getElementById("player2-score").innerText = 0;
+// ── DRAW ──
+function drawCards() {
+  if (state.playing) return;
+  state.playing = true;
 
-        document.getElementById("winner").innerText = "Press Draw Cards";
-        
-        updateStats();
-      }, 300);
-    }
+  // Hide current cards
+  document.getElementById('frame1').innerHTML = '<div class="hidden-card">🂠</div>';
+  document.getElementById('frame2').innerHTML = '<div class="hidden-card">🂠</div>';
+  document.getElementById('label1').textContent = '...';
+  document.getElementById('label2').textContent = '...';
+  document.getElementById('frame1').className = 'card-frame';
+  document.getElementById('frame2').className = 'card-frame';
 
-    updateStats();
-  </script>
+  const c1 = deal(), c2 = deal();
+
+  // Reveal P1 after short delay
+  setTimeout(() => {
+    revealCard('frame1', 'label1', c1);
+  }, 300);
+
+  // Reveal P2 after slightly longer
+  setTimeout(() => {
+    revealCard('frame2', 'label2', c2);
+
+    // Determine winner after both revealed
+    setTimeout(() => {
+      judgeRound(c1, c2);
+      state.playing = false;
+    }, 500);
+  }, 600);
+}
+
+function revealCard(frameId, labelId, card) {
+  const frame = document.getElementById(frameId);
+  frame.innerHTML = `<img src="${card.img}" alt="${card.label}" class="reveal"
+    onerror="this.outerHTML='<div style=width:100%;aspect-ratio:5/7;background:#f8f8f8;display:flex;align-items:center;justify-content:center;border-radius:6px;color:#222;font-size:22px;font-weight:900>${card.label}</div>'">`;
+  document.getElementById(labelId).textContent = card.label;
+}
+
+function judgeRound(c1, c2) {
+  state.rounds++;
+  document.getElementById('rounds').textContent = state.rounds;
+
+  const f1 = document.getElementById('frame1');
+  const f2 = document.getElementById('frame2');
+  const banner = document.getElementById('result-banner');
+  const placed = document.getElementById('placed-chips');
+
+  let msg, cls;
+  if (c1.val > c2.val) {
+    // P1 wins
+    state.score1++;
+    state.bal1 += state.currentBet;
+    state.bal2 -= state.currentBet;
+    f1.className = 'card-frame winner';
+    f2.className = 'card-frame loser';
+    msg = '🎉 Player 1 Wins! 🎉'; cls = 'win1';
+    showWinOverlay('🔵 WIN!', '#60a5fa');
+    spawnConfetti('#60a5fa');
+  } else if (c2.val > c1.val) {
+    // P2 wins
+    state.score2++;
+    state.bal2 += state.currentBet;
+    state.bal1 -= state.currentBet;
+    f1.className = 'card-frame loser';
+    f2.className = 'card-frame winner';
+    msg = '🎉 Player 2 Wins! 🎉'; cls = 'win2';
+    showWinOverlay('🔴 WIN!', '#f87171');
+    spawnConfetti('#f87171');
+  } else {
+    msg = '🤝 تعادل! 🤝'; cls = 'draw';
+  }
+
+  banner.textContent = msg;
+  banner.className = cls;
+
+  document.getElementById('s1').textContent = state.score1;
+  document.getElementById('s2').textContent = state.score2;
+  document.getElementById('bal1').textContent = `$${Math.max(0, state.bal1)}`;
+  document.getElementById('bal2').textContent = `$${Math.max(0, state.bal2)}`;
+
+  // Animate chips out
+  placed.querySelectorAll('.chip').forEach(c => {
+    c.className += ' chip-fly-out';
+    setTimeout(() => c.remove(), 340);
+  });
+  state.currentBet = 0;
+  updateBetDisplay();
+}
+
+function showWinOverlay(text, color) {
+  const ov = document.getElementById('win-overlay');
+  const tx = document.getElementById('big-win-text');
+  tx.textContent = text;
+  tx.style.color = color;
+  ov.classList.add('show');
+  setTimeout(() => ov.classList.remove('show'), 1300);
+}
+
+function spawnConfetti(primaryColor) {
+  const colors = [primaryColor, '#f5c518', '#ffffff', '#4ade80', primaryColor];
+  for (let i = 0; i < 30; i++) {
+    const el = document.createElement('div');
+    el.className = 'confetti';
+    el.style.cssText = `
+      left:${Math.random()*100}vw;top:-10px;
+      background:${colors[i%colors.length]};
+      --dur:${0.8+Math.random()*1.4}s;
+      animation-delay:${Math.random()*0.4}s;
+      width:${5+Math.random()*9}px;height:${5+Math.random()*9}px;
+    `;
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 2800);
+  }
+}
+
+function resetGame() {
+  state.score1 = 0; state.score2 = 0; state.rounds = 0;
+  state.bal1 = 500; state.bal2 = 500; state.currentBet = 0;
+  document.getElementById('s1').textContent = '0';
+  document.getElementById('s2').textContent = '0';
+  document.getElementById('rounds').textContent = '0';
+  document.getElementById('bal1').textContent = '$500';
+  document.getElementById('bal2').textContent = '$500';
+  document.getElementById('frame1').innerHTML = '<div class="hidden-card">🂠</div>';
+  document.getElementById('frame2').innerHTML = '<div class="hidden-card">🂠</div>';
+  document.getElementById('frame1').className = 'card-frame';
+  document.getElementById('frame2').className = 'card-frame';
+  document.getElementById('label1').textContent = '—';
+  document.getElementById('label2').textContent = '—';
+  document.getElementById('result-banner').textContent = 'اضغط Draw Cards للعب!';
+  document.getElementById('result-banner').className = 'idle';
+  document.getElementById('placed-chips').querySelectorAll('.chip').forEach(c => c.remove());
+  updateBetDisplay();
+  initDeck();
+}
+
+// ── INIT ──
+initDeck();
+</script>
 </body>
 </html>
