@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>👑 Baccarat Royal</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Cairo:wght@400;600;700;900&display=swap');
+    * { margin:0; padding:0; box-sizing:border-box; direction:rtl; }
+    :root {
+      --gold:#f5c518; --gold2:#d4a017;
+      --felt:#1a2a4a; --felt-dark:#0a1528;
+      --chip-shadow:0 4px 14px rgba(0,0,0,0.65);
+    }
+    html,body { height:100%; overflow:hidden; font-family:'Cairo',sans-serif; background:#050810; color:#fff; }
+
+    /* ── APP SHELL ── */
+    #app {
+      height:100dvh; display:flex; flex-direction:column; overflow:hidden;
+      background:linear-gradient(160deg,#050810 0%,#0a1528 50%,#050810 100%);
+    }
+
+    /* ── HEADER ── */
+    #header {
+      flex-shrink:0; display:flex; align-items:center; justify-content:space-between;
+      padding:6px 12px;
+      background:linear-gradient(90deg,#0a1528,#1a2a4a,#0a1528);
+      border-bottom:2px solid var(--gold);
+    }
+    #header h1 {
+      font-family:'Playfair Display',serif;
+      font-size:clamp(13px,3.8vw,22px);
+      color:var(--gold); letter-spacing:1px;
+      text-shadow:0 0 18px rgba(245,197,24,0.6);
+    }
+    #balance-box {
+      background:rgba(0,0,0,0.5); border:1.5px solid var(--gold);
+      border-radius:20px; padding:4px 12px; text-align:center;
+    }
+    #balance-box .lbl { font-size:9px; color:#aaa; }
+    #balance-box .val { font-size:clamp(12px,3vw,17px); font-weight:900; color:#4ade80; }
+    #back-btn {
+      background:rgba(0,0,0,0.4); border:1.5px solid #555; border-radius:8px;
+      padding:4px 10px; color:#ccc; font-size:11px;
+      cursor:pointer; text-decoration:none; font-family:'Cairo',sans-serif;
+    }
+
+    /* ── BET SIDE SELECTOR ── */
+    #bet-sides {
+      flex-shrink:0; display:flex; gap:6px; padding:6px 10px;
+      justify-content:center;
+    }
+    .side-btn {
+      flex:1; max-width:140px; padding:clamp(6px,1.8vw,10px) 6px;
+      border-radius:12px; border:2px solid transparent;
+      font-family:'Cairo',sans-serif; font-weight:900;
+      font-size:clamp(10px,2.5vw,14px); cursor:pointer;
+      transition:all .25s ease; position:relative; overflow:hidden;
+    }
+    .side-btn::after {
+      content:''; position:absolute; inset:0;
+      background:rgba(255,255,255,0.08); opacity:0; transition:opacity .2s;
+    }
+    .side-btn:hover::after { opacity:1; }
+    .side-btn.player-btn  { background:linear-gradient(135deg,#1d4ed8,#1e3a8a); border-color:#3b82f6; color:#93c5fd; }
+    .side-btn.tie-btn     { background:linear-gradient(135deg,#166534,#14532d); border-color:#22c55e; color:#86efac; }
+    .side-btn.banker-btn  { background:linear-gradient(135deg,#991b1b,#7f1d1d); border-color:#ef4444; color:#fca5a5; }
+    .side-btn.active      { transform:scale(1.07) translateY(-3px); box-shadow:0 0 0 3px #fff4; }
+    .side-btn .side-odds  { font-size:clamp(8px,2vw,11px); opacity:.75; display:block; }
+
+    /* ── ARENA ── */
+    #arena {
+      flex:1; display:flex; flex-direction:column;
+      gap:4px; padding:4px 10px; min-height:0; overflow:hidden;
+    }
+
+    /* ── ZONE ── */
+    .zone { display:flex; flex-direction:column; align-items:center; gap:3px; }
+    .zone-label {
+      font-size:clamp(10px,2.5vw,14px); font-weight:700;
+      letter-spacing:1px; text-transform:uppercase;
+    }
+    .zone-label.banker { color:#f87171; }
+    .zone-label.player { color:#93c5fd; }
+    .score-badge {
+      background:rgba(0,0,0,0.7); border:1.5px solid var(--gold);
+      border-radius:12px; padding:2px 14px;
+      font-size:clamp(12px,3.5vw,20px); font-weight:900; color:#fff;
+      min-width:60px; text-align:center;
+    }
+    .score-badge.natural { border-color:#4ade80; color:#4ade80; animation:naturalGlow 1s ease infinite alternate; }
+    @keyframes naturalGlow {
+      from { box-shadow:0 0 8px rgba(74,222,128,0.3); }
+      to   { box-shadow:0 0 22px rgba(74,222,128,0.8); }
+    }
+
+    /* ── CARD ROW ── */
+    .card-row {
+      display:flex; justify-content:center; align-items:center;
+      gap:5px; flex-wrap:nowrap;
+      min-height:clamp(62px,15vw,100px);
+    }
+    .card {
+      width:clamp(42px,9.5vw,66px);
+      height:clamp(59px,13.5vw,93px);
+      border-radius:6px; overflow:hidden;
+      box-shadow:0 4px 14px rgba(0,0,0,0.7),0 0 0 1px rgba(255,255,255,0.15);
+      background:#fff; flex-shrink:0;
+      animation:dealCard .4s cubic-bezier(.34,1.56,.64,1) both;
+    }
+    .card img { width:100%; height:100%; object-fit:cover; display:block; }
+    .card-back {
+      background:linear-gradient(135deg,#1e3a8a 0%,#1d4ed8 50%,#1e3a8a 100%);
+      display:flex; align-items:center; justify-content:center; font-size:20px;
+    }
+    @keyframes dealCard {
+      0%   { transform:translateY(-50px) rotate(-10deg) scale(.7); opacity:0; }
+      100% { transform:translateY(0) rotate(0) scale(1); opacity:1; }
+    }
+
+    .divider {
+      flex-shrink:0; border:none;
+      border-top:1px dashed rgba(245,197,24,0.35); margin:0 16px;
+    }
+
+    /* ── STATUS ── */
+    #game-status {
+      flex-shrink:0; text-align:center;
+      font-size:clamp(11px,3vw,16px); font-weight:700;
+      padding:5px 14px; border-radius:20px; margin:0 8px;
+      border:1.5px solid #555; color:#60a5fa;
+      background:rgba(96,165,250,.1); transition:all .3s;
+    }
+    #game-status.win   { color:#4ade80; background:rgba(74,222,128,.12); border-color:#4ade80; animation:winPulse .6s ease; }
+    #game-status.lose  { color:#f87171; background:rgba(248,113,113,.12); border-color:#f87171; animation:shakePulse .5s ease; }
+    #game-status.tie   { color:var(--gold); background:rgba(245,197,24,.1); border-color:var(--gold); }
+    @keyframes winPulse  { 0%,100%{box-shadow:0 0 0 rgba(74,222,128,0);}50%{box-shadow:0 0 22px rgba(74,222,128,.6);} }
+    @keyframes shakePulse{ 0%,100%{transform:translateX(0);}25%{transform:translateX(-6px);}75%{transform:translateX(6px);} }
+
+    /* ── BET DISPLAY ── */
+    #bet-row {
+      flex-shrink:0; display:flex; align-items:center;
+      justify-content:center; gap:10px; padding:3px 10px;
+    }
+    #bet-display {
+      display:flex; align-items:center; justify-content:center;
+      flex-wrap:wrap; gap:4px; min-width:80px; min-height:38px;
+      background:rgba(0,0,0,0.4);
+      border:1.5px dashed rgba(245,197,24,0.45); border-radius:12px; padding:4px 10px;
+    }
+    #bet-tag { font-size:clamp(12px,3vw,17px); font-weight:900; color:var(--gold); }
+
+    /* ── CHIP TRAY ── */
+    #chip-tray {
+      flex-shrink:0; display:flex; justify-content:center;
+      gap:clamp(8px,2.5vw,18px); padding:4px 8px;
+    }
+    .chip {
+      width:clamp(40px,10.5vw,56px); height:clamp(40px,10.5vw,56px);
+      border-radius:50%; display:flex; align-items:center; justify-content:center;
+      font-weight:900; font-size:clamp(8px,2.2vw,12px);
+      cursor:pointer; user-select:none;
+      transition:transform .2s,box-shadow .2s;
+      position:relative; border:3px solid rgba(255,255,255,.25);
+      box-shadow:var(--chip-shadow),inset 0 2px 5px rgba(255,255,255,.2);
+    }
+    .chip::before {
+      content:''; position:absolute; inset:4px;
+      border-radius:50%; border:1.5px dashed rgba(255,255,255,.35);
+    }
+    .chip:hover  { transform:scale(1.12) translateY(-4px); }
+    .chip:active { transform:scale(.93); }
+    .chip.selected { box-shadow:0 0 0 3px #fff,var(--chip-shadow); transform:scale(1.1) translateY(-5px); }
+    .chip-5   { background:radial-gradient(circle at 35% 35%,#c084fc,#7e22ce); border-color:#a855f7; }
+    .chip-10  { background:radial-gradient(circle at 35% 35%,#6ee7b7,#047857); border-color:#10b981; }
+    .chip-25  { background:radial-gradient(circle at 35% 35%,#93c5fd,#1d4ed8); border-color:#3b82f6; }
+    .chip-50  { background:radial-gradient(circle at 35% 35%,#fcd34d,#b45309); border-color:#f59e0b; }
+    .chip-100 { background:radial-gradient(circle at 35% 35%,#fca5a5,#b91c1c); border-color:#ef4444; }
+    @keyframes chipIn  { 0%{transform:scale(0) rotate(180deg) translateY(-20px);opacity:0;}60%{transform:scale(1.2) rotate(-10deg);opacity:1;}100%{transform:scale(1);opacity:1;} }
+    @keyframes chipOut { 0%{transform:scale(1);opacity:1;}100%{transform:scale(0) rotate(360deg) translateY(-30px);opacity:0;} }
+    .chip-in  { animation:chipIn  .4s cubic-bezier(.34,1.56,.64,1) both; }
+    .chip-out { animation:chipOut .35s ease-in both; }
+
+    /* ── ACTION BUTTONS ── */
+    #action-row {
+      flex-shrink:0; display:flex; justify-content:center;
+      gap:clamp(5px,2vw,10px); padding:4px 6px; flex-wrap:wrap;
+    }
+    .btn {
+      padding:clamp(7px,1.8vw,11px) clamp(10px,3vw,22px);
+      font-family:'Cairo',sans-serif;
+      font-size:clamp(10px,2.5vw,14px); font-weight:700;
+      border:none; border-radius:10px; cursor:pointer;
+      transition:all .2s; min-width:clamp(58px,15vw,88px);
+    }
+    .btn:hover:not(:disabled) { transform:translateY(-2px); box-shadow:0 6px 16px rgba(0,0,0,.4); }
+    .btn:active:not(:disabled){ transform:scale(.94); }
+    .btn:disabled { opacity:.35; cursor:not-allowed; }
+    .btn-deal  { background:linear-gradient(135deg,#22c55e,#15803d); color:#fff; }
+    .btn-clear { background:linear-gradient(135deg,#ef4444,#991b1b); color:#fff; }
+    .btn-new   { background:linear-gradient(135deg,#64748b,#334155); color:#fff; }
+
+    /* ── STATS ── */
+    #stats-bar {
+      flex-shrink:0; display:flex; justify-content:center;
+      gap:8px; padding:3px 8px; font-size:clamp(9px,2.2vw,12px);
+    }
+    .stat-pill {
+      background:rgba(0,0,0,.5); border-radius:10px;
+      padding:2px 10px; border:1px solid rgba(255,255,255,.1);
+    }
+    .stat-pill span { font-weight:700; }
+    .sw { color:#4ade80; } .sl { color:#f87171; } .sd { color:var(--gold); }
+
+    #footer { flex-shrink:0; text-align:center; padding:3px; border-top:1px solid rgba(255,255,255,.06); }
+    #footer a { font-size:9px; color:#444; text-decoration:none; }
+
+    /* ── HISTORY DOTS ── */
+    #history-row {
+      flex-shrink:0; display:flex; justify-content:center; gap:4px; padding:2px 10px; flex-wrap:wrap;
+    }
+    .hist-dot {
+      width:clamp(10px,2.8vw,16px); height:clamp(10px,2.8vw,16px);
+      border-radius:50%; font-size:7px; display:flex; align-items:center; justify-content:center;
+      font-weight:900; animation:dotPop .3s cubic-bezier(.34,1.56,.64,1) both;
+    }
+    @keyframes dotPop { 0%{transform:scale(0);}100%{transform:scale(1);} }
+    .hist-p { background:#1d4ed8; }
+    .hist-b { background:#b91c1c; }
+    .hist-t { background:#166534; }
+
+    /* ── WIN OVERLAY ── */
+    #win-overlay {
+      position:fixed; inset:0; pointer-events:none; z-index:99;
+      display:none; justify-content:center; align-items:center;
+    }
+    #win-overlay.show { display:flex; }
+    .win-text {
+      font-family:'Playfair Display',serif;
+      font-size:clamp(36px,12vw,80px); font-weight:900; text-align:center;
+      animation:winExplode 1.2s cubic-bezier(.34,1.56,.64,1) forwards;
+    }
+    @keyframes winExplode {
+      0%   { transform:scale(.2) rotate(-15deg); opacity:0; }
+      50%  { transform:scale(1.15) rotate(3deg); opacity:1; }
+      80%  { transform:scale(1); opacity:1; }
+      100% { transform:scale(1.4); opacity:0; }
+    }
+    .confetti { position:fixed; border-radius:2px; pointer-events:none; animation:fall var(--d) linear var(--delay) forwards; }
+    @keyframes fall { 0%{transform:translateY(-20px) rotate(0);opacity:1;} 100%{transform:translateY(110vh) rotate(720deg);opacity:0;} }
+  </style>
+</head>
+<body>
+<div id="app">
+
+  <!-- HEADER -->
+  <div id="header">
+    <a href="./index.html" id="back-btn">⬅ الرئيسية</a>
+    <h1>👑 BACCARAT ROYAL</h1>
+    <div id="balance-box">
+      <div class="lbl">💰 رصيدك</div>
+      <div class="val" id="balance">$2,000</div>
+    </div>
+  </div>
+
+  <!-- BET SIDES -->
+  <div id="bet-sides">
+    <button class="side-btn player-btn active" onclick="selectSide('player',this)">
+      🔵 Player <span class="side-odds">1:1</span>
+    </button>
+    <button class="side-btn tie-btn" onclick="selectSide('tie',this)">
+      🟢 Tie <span class="side-odds">8:1</span>
+    </button>
+    <button class="side-btn banker-btn" onclick="selectSide('banker',this)">
+      🔴 Banker <span class="side-odds">1:1</span>
+    </button>
+  </div>
+
+  <!-- ARENA -->
+  <div id="arena">
+
+    <!-- BANKER -->
+    <div class="zone">
+      <div class="zone-label banker">🔴 Banker</div>
+      <div class="card-row" id="banker-cards"></div>
+      <div class="score-badge" id="banker-score">0</div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- STATUS -->
+    <div id="game-status">اختر الجانب ← ضع فيش ← ابدأ</div>
+
+    <!-- BET ROW -->
+    <div id="bet-row">
+      <div>
+        <div style="font-size:9px;color:#888;text-align:center">الرهان</div>
+        <div id="bet-display"><span id="bet-tag">$0</span></div>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- PLAYER -->
+    <div class="zone">
+      <div class="zone-label player">🔵 Player</div>
+      <div class="card-row" id="player-cards"></div>
+      <div class="score-badge" id="player-score">0</div>
+    </div>
+
+  </div>
+
+  <!-- HISTORY -->
+  <div id="history-row"></div>
+
+  <!-- CHIP TRAY -->
+  <div id="chip-tray">
+    <div class="chip chip-5"   onclick="addBet(5,'chip-5')">$5</div>
+    <div class="chip chip-10"  onclick="addBet(10,'chip-10')">$10</div>
+    <div class="chip chip-25"  onclick="addBet(25,'chip-25')">$25</div>
+    <div class="chip chip-50"  onclick="addBet(50,'chip-50')">$50</div>
+    <div class="chip chip-100" onclick="addBet(100,'chip-100')">$100</div>
+  </div>
+
+  <!-- ACTIONS -->
+  <div id="action-row">
+    <button class="btn btn-deal"  id="deal-btn" onclick="dealRound()">🃏 ابدأ الجولة</button>
+    <button class="btn btn-clear" onclick="clearBet()">🗑 مسح</button>
+    <button class="btn btn-new"   onclick="resetGame()">🔄 جديد</button>
+  </div>
+
+  <!-- STATS -->
+  <div id="stats-bar">
+    <div class="stat-pill">🔵 <span class="sw" id="pwins">0</span></div>
+    <div class="stat-pill">🔴 <span class="sl" id="bwins">0</span></div>
+    <div class="stat-pill">🟢 <span class="sd" id="ties">0</span></div>
+    <div class="stat-pill">🎮 <span id="rounds">0</span> جولة</div>
+  </div>
+
+  <div id="footer"><a href="./index.html">Casino Games Pro © 2026</a></div>
+</div>
+
+<div id="win-overlay"><div class="win-text" id="win-text"></div></div>
+
+<script>
+// ── DECK ──
+const SUITS = ['spades','hearts','clubs','diamonds'];
+const RANKS = ['2','3','4','5','6','7','8','9','10','jack','queen','king','ace'];
+const BVAL  = { '2':2,'3':3,'4':4,'5':5,'6':6,'7':7,'8':8,'9':9,'10':0,'jack':0,'queen':0,'king':0,'ace':1 };
+const DISP  = { '2':'2','3':'3','4':'4','5':'5','6':'6','7':'7','8':'8','9':'9','10':'10','jack':'J','queen':'Q','king':'K','ace':'A' };
+
+function buildDeck() {
+  const d = [];
+  SUITS.forEach(s => RANKS.forEach(r => d.push({ img:`./assets/${r}_of_${s}.png`, bv:BVAL[r], label:`${DISP[r]}${s[0].toUpperCase()}` })));
+  return d;
+}
+function shuffle(a) { for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]; } }
+
+// ── STATE ──
+let S = { deck:[], balance:2000, bet:0, side:'player', rounds:0, pwins:0, bwins:0, ties:0, busy:false, history:[] };
+
+function initDeck() { S.deck=[...buildDeck(),...buildDeck(),...buildDeck(),...buildDeck()]; shuffle(S.deck); }
+function deal() { if(S.deck.length<10)initDeck(); return S.deck.pop(); }
+function bacScore(hand) { return hand.reduce((a,c)=>a+c.bv,0)%10; }
+
+// ── UI ──
+function setStatus(t,c='') {
+  const el=document.getElementById('game-status');
+  el.textContent=t; el.className=c||'';
+}
+function updateBalance() { document.getElementById('balance').textContent=`$${S.balance.toLocaleString()}`; }
+function updateBetTag() { document.getElementById('bet-tag').textContent=`$${S.bet}`; }
+function updateStats() {
+  document.getElementById('pwins').textContent=S.pwins;
+  document.getElementById('bwins').textContent=S.bwins;
+  document.getElementById('ties').textContent=S.ties;
+  document.getElementById('rounds').textContent=S.rounds;
+}
+function setScore(id, val, natural) {
+  const el=document.getElementById(id);
+  el.textContent=val;
+  el.className='score-badge'+(natural?' natural':'');
+}
+
+// ── RENDER CARDS ──
+function renderCards(containerId, hand, delay=0) {
+  const el=document.getElementById(containerId);
+  el.innerHTML='';
+  hand.forEach((card,i)=>{
+    const div=document.createElement('div');
+    div.className='card';
+    div.style.animationDelay=`${delay+i*0.1}s`;
+    div.style.background='white';
+    div.innerHTML=`<img src="${card.img}" alt="${card.label}"
+      onerror="this.parentElement.innerHTML='<div style=width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#111;font-size:16px;font-weight:900;background:#fff>${card.label}</div>'">`;
+    el.appendChild(div);
+  });
+}
+
+// ── BET ──
+let lastChipCls='chip-25';
+function selectSide(side, btn) {
+  S.side=side;
+  document.querySelectorAll('.side-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+function addBet(val, cls) {
+  if(S.busy) return;
+  lastChipCls=cls;
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('selected'));
+  document.querySelector('.'+cls).classList.add('selected');
+  const add=Math.min(val,S.balance);
+  if(!add) return;
+  S.bet+=add; S.balance-=add;
+  updateBalance(); updateBetTag();
+  const bd=document.getElementById('bet-display');
+  const c=document.createElement('div');
+  c.className=`chip ${cls} chip-in`;
+  c.style.cssText='width:26px;height:26px;font-size:8px;border-width:2px;flex-shrink:0';
+  c.textContent=`$${add}`;
+  bd.insertBefore(c,document.getElementById('bet-tag'));
+}
+function clearBet() {
+  if(S.busy||S.bet===0) return;
+  S.balance+=S.bet; S.bet=0;
+  updateBalance(); updateBetTag();
+  document.getElementById('bet-display').querySelectorAll('.chip').forEach(c=>{ c.className+=' chip-out'; setTimeout(()=>c.remove(),340); });
+}
+
+// ── DEAL ROUND ──
+async function dealRound() {
+  if(S.busy) return;
+  if(S.bet===0){ setStatus('ضع رهاناً أولاً!','lose'); return; }
+  S.busy=true;
+  document.getElementById('deal-btn').disabled=true;
+
+  // Clear board
+  document.getElementById('banker-cards').innerHTML='';
+  document.getElementById('player-cards').innerHTML='';
+  setScore('banker-score',0,false);
+  setScore('player-score',0,false);
+  setStatus('يتم توزيع البطاقات...','');
+
+  // Deal
+  const pH=[deal(),deal()], bH=[deal(),deal()];
+  let ps=bacScore(pH), bs=bacScore(bH);
+  const pNat=ps>=8, bNat=bs>=8;
+
+  // Reveal with timing
+  await pause(200);
+  renderCards('player-cards', ph=[pH[0]]);
+  await pause(300);
+  renderCards('banker-cards', bh=[bH[0]]);
+  await pause(300);
+  renderCards('player-cards', ph=[pH[0],pH[1]]);
+  await pause(300);
+  renderCards('banker-cards', bh=[bH[0],bH[1]]);
+  setScore('player-score', ps, pNat);
+  setScore('banker-score', bs, bNat);
+  await pause(400);
+
+  // Third card rules
+  let p3=null, b3=null;
+  if(!pNat && !bNat) {
+    if(ps<=5) { p3=deal(); pH.push(p3); ps=bacScore(pH); renderCards('player-cards',pH); setScore('player-score',ps,false); await pause(400); }
+    if(p3===null) {
+      if(bs<=5) { b3=deal(); bH.push(b3); bs=bacScore(bH); renderCards('banker-cards',bH); setScore('banker-score',bs,false); await pause(400); }
+    } else {
+      const pv=p3.bv;
+      if((bs<=2)||(bs===3&&pv!==8)||(bs===4&&pv>=2&&pv<=7)||(bs===5&&pv>=4&&pv<=7)||(bs===6&&pv>=6&&pv<=7)) {
+        b3=deal(); bH.push(b3); bs=bacScore(bH); renderCards('banker-cards',bH); setScore('banker-score',bs,false); await pause(400);
+      }
+    }
+  }
+
+  setScore('player-score',ps,pNat);
+  setScore('banker-score',bs,bNat);
+
+  // Result
+  S.rounds++;
+  let winner = ps>bs?'player': bs>ps?'banker':'tie';
+  let gain=0, msg='', cls='';
+
+  if(winner==='tie'){
+    S.ties++;
+    addToHistory('t');
+    if(S.side==='tie') { gain=S.bet*8; msg=`🟢 Tie! فزت $${gain}!`; cls='win'; spawnConfetti('#22c55e'); showWinOverlay('🟢 TIE WIN!','#22c55e'); }
+    else { gain=S.bet; msg='🤝 تعادل! الرهان مُرتجَع'; cls='tie'; } // push
+  } else if(winner===S.side) {
+    winner==='player'?S.pwins++:S.bwins++;
+    addToHistory(winner==='player'?'p':'b');
+    const odds=S.side==='tie'?8:1;
+    gain=S.bet*(1+odds);
+    msg=`🎉 ${winner==='player'?'Player':'Banker'} فاز! ربحت $${S.bet}!`; cls='win';
+    spawnConfetti(S.side==='player'?'#60a5fa':'#f87171');
+    showWinOverlay(winner==='player'?'🔵 WIN!':'🔴 WIN!',S.side==='player'?'#60a5fa':'#f87171');
+  } else {
+    winner==='player'?S.pwins++:S.bwins++;
+    addToHistory(winner==='player'?'p':'b');
+    msg=`😢 ${winner==='player'?'Player':'Banker'} فاز — خسرت!`; cls='lose';
+    gain=0;
+  }
+
+  if(winner==='tie'&&S.side!=='tie') gain=S.bet; // push
+  S.balance+=gain; S.bet=0;
+  updateBalance(); updateBetTag();
+  setStatus(msg,cls);
+  updateStats();
+  document.getElementById('bet-display').querySelectorAll('.chip').forEach(c=>{ c.className+=' chip-out'; setTimeout(()=>c.remove(),340); });
+
+  S.busy=false;
+  document.getElementById('deal-btn').disabled=false;
+}
+
+function pause(ms){ return new Promise(r=>setTimeout(r,ms)); }
+
+function addToHistory(type) {
+  S.history.push(type);
+  if(S.history.length>20) S.history.shift();
+  const hr=document.getElementById('history-row');
+  hr.innerHTML='';
+  S.history.forEach(t=>{
+    const d=document.createElement('div');
+    d.className=`hist-dot hist-${t}`;
+    d.textContent=t.toUpperCase();
+    hr.appendChild(d);
+  });
+}
+
+function resetGame() {
+  S={ deck:S.deck, balance:2000, bet:0, side:'player', rounds:0, pwins:0, bwins:0, ties:0, busy:false, history:[] };
+  document.getElementById('banker-cards').innerHTML='';
+  document.getElementById('player-cards').innerHTML='';
+  setScore('banker-score',0,false);
+  setScore('player-score',0,false);
+  document.getElementById('bet-display').querySelectorAll('.chip').forEach(c=>c.remove());
+  document.getElementById('history-row').innerHTML='';
+  document.querySelectorAll('.side-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelector('.player-btn').classList.add('active');
+  document.getElementById('deal-btn').disabled=false;
+  updateBalance(); updateBetTag(); updateStats();
+  setStatus('اختر الجانب ← ضع فيش ← ابدأ','');
+}
+
+// ── WIN FX ──
+function showWinOverlay(txt,color){
+  const ov=document.getElementById('win-overlay'), tx=document.getElementById('win-text');
+  tx.textContent=txt; tx.style.color=color;
+  ov.classList.add('show'); setTimeout(()=>ov.classList.remove('show'),1300);
+}
+function spawnConfetti(primary){
+  const cols=[primary,'#f5c518','#fff','#4ade80',primary];
+  for(let i=0;i<30;i++){
+    const el=document.createElement('div');
+    el.className='confetti';
+    el.style.cssText=`left:${Math.random()*100}vw;top:-10px;background:${cols[i%cols.length]};--d:${.9+Math.random()*1.3}s;--delay:${Math.random()*.4}s;width:${6+Math.random()*8}px;height:${6+Math.random()*8}px;`;
+    document.body.appendChild(el);
+    setTimeout(()=>el.remove(),2800);
+  }
+}
+
+initDeck();
+updateBalance();
+</script>
+</body>
+</html>
