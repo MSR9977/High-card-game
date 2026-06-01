@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+  <title>High Card Game</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-900 text-white overflow-x-hidden">
+  <div
+    class="min-h-screen flex flex-col items-center justify-center p-4"
+  >
+    <h1
+      class="text-3xl md:text-5xl font-bold mb-8 text-yellow-400 text-center"
+    >
+      High Card Game
+    </h1>
+    <div
+      class="flex flex-row flex-wrap justify-center gap-4 md:gap-8 mb-8 w-full"
+    >
+      <div
+        class="bg-slate-800 p-4 rounded-2xl w-[45%] max-w-[260px] text-center shadow-2xl"
+      >
+        <h2 class="text-xl md:text-2xl font-bold mb-4">
+          Player 1
+        </h2>
+        <div class="bg-white rounded-2xl p-2">
+          <img
+            id="player1-card"
+            src="./assets/back.png"
+            class="w-full rounded-xl"
+          >
+        </div>
+        <p
+          id="player1-name"
+          class="mt-4 text-sm md:text-lg font-semibold"
+        >
+          Hidden Card
+        </p>
+      </div>
+      <div
+        class="bg-slate-800 p-4 rounded-2xl w-[45%] max-w-[260px] text-center shadow-2xl"
+      >
+        <h2 class="text-xl md:text-2xl font-bold mb-4">
+          Player 2
+        </h2>
+        <div class="bg-white rounded-2xl p-2">
+          <img
+            id="player2-card"
+            src="./assets/back.png"
+            class="w-full rounded-xl"
+          >
+        </div>
+        <p
+          id="player2-name"
+          class="mt-4 text-sm md:text-lg font-semibold"
+        >
+          Hidden Card
+        </p>
+      </div>
+    </div>
+    <h2
+      id="winner"
+      class="text-2xl md:text-4xl font-bold mb-6 text-green-400 text-center"
+    >
+      Press Draw Cards
+    </h2>
+    <div
+      class="bg-slate-800 p-5 rounded-2xl text-center w-full max-w-sm"
+    >
+      <h3 class="text-2xl md:text-3xl font-bold mb-4">
+        Score Board
+      </h3>
+      <p class="text-xl md:text-2xl mb-2">
+        Player 1:
+        <span
+          id="player1-score"
+          class="text-yellow-400"
+        >
+          0
+        </span>
+      </p>
+      <p class="text-xl md:text-2xl">
+        Player 2:
+        <span
+          id="player2-score"
+          class="text-yellow-400"
+        >
+          0
+        </span>
+      </p>
+    </div>
+    <div
+      class="mt-8 flex flex-wrap justify-center gap-4"
+    >
+      <button
+        onclick="drawCards()"
+        class="bg-blue-500 hover:bg-blue-600 px-6 py-3 rounded-xl font-bold text-sm md:text-lg"
+      >
+        Draw Cards
+      </button>
+      <button
+        onclick="resetGame()"
+        class="bg-red-500 hover:bg-red-600 px-6 py-3 rounded-xl font-bold text-sm md:text-lg"
+      >
+        Reset
+      </button>
+    </div>
+  </div>
+  <script>
+    const cards = [
+      ["Ace of Spades", 14, "./assets/ace_of_spades.png"],
+      ["Ace of Hearts", 14, "./assets/ace_of_hearts.png"],
+      ["Ace of Clubs", 14, "./assets/ace_of_clubs.png"],
+      ["Ace of Diamonds", 14, "./assets/ace_of_diamonds.png"],
+      ["King of Spades", 13, "./assets/king_of_spades.png"],
+      ["King of Hearts", 13, "./assets/king_of_hearts.png"],
+      ["King of Clubs", 13, "./assets/king_of_clubs.png"],
+      ["King of Diamonds", 13, "./assets/king_of_diamonds.png"],
+      ["Queen of Spades", 12, "./assets/queen_of_spades.png"],
+      ["Queen of Hearts", 12, "./assets/queen_of_hearts.png"],
+      ["Queen of Clubs", 12, "./assets/queen_of_clubs.png"],
+      ["Queen of Diamonds", 12, "./assets/queen_of_diamonds.png"],
+      ["Jack of Spades", 11, "./assets/jack_of_spades.png"],
+      ["Jack of Hearts", 11, "./assets/jack_of_hearts.png"],
+      ["Jack of Clubs", 11, "./assets/jack_of_clubs.png"],
+      ["Jack of Diamonds", 11, "./assets/jack_of_diamonds.png"],
+      ["10 of Spades", 10, "./assets/10_of_spades.png"],
+      ["10 of Hearts", 10, "./assets/10_of_hearts.png"],
+      ["10 of Clubs", 10, "./assets/10_of_clubs.png"],
+      ["10 of Diamonds", 10, "./assets/10_of_diamonds.png"],
+
+      ["9 of Spades", 9, "./assets/9_of_spades.png"],
+      ["9 of Hearts", 9, "./assets/9_of_hearts.png"],
+      ["9 of Clubs", 9, "./assets/9_of_clubs.png"],
+      ["9 of Diamonds", 9, "./assets/9_of_diamonds.png"],
+
+      ["8 of Spades", 8, "./assets/8_of_spades.png"],
+      ["8 of Hearts", 8, "./assets/8_of_hearts.png"],
+      ["8 of Clubs", 8, "./assets/8_of_clubs.png"],
+      ["8 of Diamonds", 8, "./assets/8_of_diamonds.png"],
+
+      ["7 of Spades", 7, "./assets/7_of_spades.png"],
+      ["7 of Hearts", 7, "./assets/7_of_hearts.png"],
+      ["7 of Clubs", 7, "./assets/7_of_clubs.png"],
+      ["7 of Diamonds", 7, "./assets/7_of_diamonds.png"],
+
+      ["6 of Spades", 6, "./assets/6_of_spades.png"],
+      ["6 of Hearts", 6, "./assets/6_of_hearts.png"],
+      ["6 of Clubs", 6, "./assets/6_of_clubs.png"],
+      ["6 of Diamonds", 6, "./assets/6_of_diamonds.png"],
+
+      ["5 of Spades", 5, "./assets/5_of_spades.png"],
+      ["5 of Hearts", 5, "./assets/5_of_hearts.png"],
+      ["5 of Clubs", 5, "./assets/5_of_clubs.png"],
+      ["5 of Diamonds", 5, "./assets/5_of_diamonds.png"],
+
+      ["4 of Spades", 4, "./assets/4_of_spades.png"],
+      ["4 of Hearts", 4, "./assets/4_of_hearts.png"],
+      ["4 of Clubs", 4, "./assets/4_of_clubs.png"],
+      ["4 of Diamonds", 4, "./assets/4_of_diamonds.png"],
+
+      ["3 of Spades", 3, "./assets/3_of_spades.png"],
+      ["3 of Hearts", 3, "./assets/3_of_hearts.png"],
+      ["3 of Clubs", 3, "./assets/3_of_clubs.png"],
+      ["3 of Diamonds", 3, "./assets/3_of_diamonds.png"],
+
+      ["2 of Spades", 2, "./assets/2_of_spades.png"],
+      ["2 of Hearts", 2, "./assets/2_of_hearts.png"],
+      ["2 of Clubs", 2, "./assets/2_of_clubs.png"],
+      ["2 of Diamonds", 2, "./assets/2_of_diamonds.png"]
+
+    ]
+
+    let player1Score = 0
+    let player2Score = 0
+
+    function randomCard() {
+
+      return cards[
+        Math.floor(Math.random() * cards.length)
+      ]
+    }
+
+    function drawCards() {
+
+      const p1 = randomCard()
+      const p2 = randomCard()
+
+      document.getElementById("player1-card").src = p1[2]
+      document.getElementById("player2-card").src = p2[2]
+
+      document.getElementById("player1-name").innerText = p1[0]
+      document.getElementById("player2-name").innerText = p2[0]
+
+      if (p1[1] > p2[1]) {
+
+        player1Score++
+
+        document.getElementById("winner").innerText =
+          "Player 1 Wins!"
+
+      }
+
+      else if (p2[1] > p1[1]) {
+
+        player2Score++
+
+        document.getElementById("winner").innerText =
+          "Player 2 Wins!"
+
+      }
+
+      else {
+
+        document.getElementById("winner").innerText =
+          "Draw!"
+
+      }
+
+      document.getElementById("player1-score").innerText =
+        player1Score
+
+      document.getElementById("player2-score").innerText =
+        player2Score
+    }
+
+    function resetGame() {
+
+      player1Score = 0
+      player2Score = 0
+
+      document.getElementById("player1-card").src =
+        "./assets/back.png"
+
+      document.getElementById("player2-card").src =
+        "./assets/back.png"
+
+      document.getElementById("player1-name").innerText =
+        "Hidden Card"
+
+      document.getElementById("player2-name").innerText =
+        "Hidden Card"
+
+      document.getElementById("player1-score").innerText = 0
+
+      document.getElementById("player2-score").innerText = 0
+
+      document.getElementById("winner").innerText =
+        "Press Draw Cards"
+    }
+
+  </script>
+
+</body>
+</html>
