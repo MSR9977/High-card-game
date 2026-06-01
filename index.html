@@ -135,6 +135,7 @@
       background: linear-gradient(135deg, transparent 0%, rgba(251, 191, 36, 0.1) 100%);
       opacity: 0;
       transition: opacity 0.3s ease;
+      pointer-events: none;
     }
 
     .game-card:hover {
@@ -210,6 +211,8 @@
       display: inline-block;
       letter-spacing: 1px;
       box-shadow: 0 4px 15px rgba(251, 191, 36, 0.3);
+      position: relative;
+      z-index: 10;
     }
 
     .btn-play:hover {
