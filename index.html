@@ -3,360 +3,375 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🎰 منصة الألعاب - Casino Games Platform</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <title>🎰 Casino Games Pro</title>
   <style>
-    * {
-      direction: rtl;
-    }
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Cairo:wght@400;600;700;900&display=swap');
 
-    @keyframes pulse {
-      0%, 100% {
-        transform: scale(1);
-      }
-      50% {
-        transform: scale(1.05);
-      }
-    }
+    * { margin:0; padding:0; box-sizing:border-box; direction:rtl; }
 
-    @keyframes glow {
-      0%, 100% {
-        text-shadow: 0 0 10px rgba(250, 204, 21, 0.5);
-        box-shadow: 0 0 20px rgba(250, 204, 21, 0.3);
-      }
-      50% {
-        text-shadow: 0 0 20px rgba(250, 204, 21, 1);
-        box-shadow: 0 0 40px rgba(250, 204, 21, 0.6);
-      }
-    }
-
-    @keyframes float {
-      0%, 100% {
-        transform: translateY(0);
-      }
-      50% {
-        transform: translateY(-20px);
-      }
-    }
-
-    @keyframes shine {
-      0% {
-        background-position: -1000px 0;
-      }
-      100% {
-        background-position: 1000px 0;
-      }
-    }
-
-    body {
-      background: linear-gradient(135deg, #0f0f1e 0%, #1a0a2e 50%, #0f0f1e 100%);
-      min-height: 100vh;
-      position: relative;
+    html, body {
+      min-height: 100%;
+      font-family: 'Cairo', sans-serif;
+      background: #050a05;
+      color: white;
       overflow-x: hidden;
     }
 
+    /* ── BACKGROUND ── */
     body::before {
       content: '';
       position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: 
-        radial-gradient(circle at 20% 50%, rgba(251, 146, 60, 0.1) 0%, transparent 50%),
-        radial-gradient(circle at 80% 80%, rgba(59, 130, 246, 0.1) 0%, transparent 50%);
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80vw 60vh at 20% 20%, rgba(245,197,24,0.06) 0%, transparent 60%),
+        radial-gradient(ellipse 80vw 60vh at 80% 80%, rgba(34,197,94,0.05) 0%, transparent 60%),
+        linear-gradient(160deg, #050a05 0%, #0d2818 50%, #050a05 100%);
       pointer-events: none;
       z-index: 0;
     }
 
-    .container-main {
-      position: relative;
-      z-index: 1;
+    /* ── FELT PATTERN ── */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: repeating-linear-gradient(
+        45deg,
+        transparent,
+        transparent 2px,
+        rgba(255,255,255,0.012) 2px,
+        rgba(255,255,255,0.012) 4px
+      );
+      pointer-events: none;
+      z-index: 0;
     }
 
+    main { position: relative; z-index: 1; }
+
+    /* ── HEADER ── */
     header {
       text-align: center;
-      padding: 40px 20px;
-      background: linear-gradient(135deg, rgba(30, 58, 138, 0.3) 0%, rgba(139, 92, 246, 0.3) 100%);
-      border-bottom: 3px solid #fbbf24;
-      margin-bottom: 60px;
+      padding: clamp(28px,6vw,60px) 20px clamp(20px,4vw,40px);
+      border-bottom: 2px solid rgba(245,197,24,0.3);
+      position: relative;
+    }
+    header::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 200px;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, #f5c518, transparent);
     }
 
-    h1 {
-      font-size: 3.5rem;
-      font-weight: 900;
-      color: #fbbf24;
-      animation: glow 2s ease-in-out infinite;
+    .logo-line {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
       margin-bottom: 10px;
-      text-shadow: 0 4px 20px rgba(251, 191, 36, 0.5);
     }
-
-    .subtitle {
-      color: #94a3b8;
-      font-size: 1.1rem;
+    .logo-line .suits {
+      font-size: clamp(20px, 5vw, 36px);
+      letter-spacing: 4px;
+    }
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(28px, 8vw, 58px);
+      font-weight: 900;
+      color: #f5c518;
+      text-shadow: 0 0 30px rgba(245,197,24,0.5), 0 4px 20px rgba(0,0,0,0.8);
       letter-spacing: 2px;
+      animation: titleGlow 3s ease-in-out infinite;
+    }
+    @keyframes titleGlow {
+      0%,100% { text-shadow: 0 0 20px rgba(245,197,24,0.4); }
+      50%      { text-shadow: 0 0 40px rgba(245,197,24,0.9), 0 0 80px rgba(245,197,24,0.3); }
+    }
+    .subtitle {
+      color: #64748b;
+      font-size: clamp(11px, 2.5vw, 16px);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-top: 6px;
     }
 
+    /* ── STATS STRIP ── */
+    .stats-strip {
+      display: flex;
+      justify-content: center;
+      gap: clamp(8px,3vw,24px);
+      padding: clamp(14px,3vw,24px) 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .stat {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: rgba(245,197,24,0.07);
+      border: 1px solid rgba(245,197,24,0.25);
+      border-radius: 14px;
+      padding: clamp(8px,2vw,14px) clamp(14px,4vw,28px);
+    }
+    .stat .num {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(20px, 6vw, 36px);
+      font-weight: 900;
+      color: #f5c518;
+      line-height: 1;
+    }
+    .stat .lbl {
+      font-size: clamp(9px, 2vw, 12px);
+      color: #64748b;
+      margin-top: 2px;
+      white-space: nowrap;
+    }
+
+    /* ── GAMES GRID ── */
     .games-grid {
       display: grid;
       grid-template-columns: 1fr;
-      gap: 40px;
-      max-width: 1200px;
-      margin: 0 auto 60px;
-      padding: 0 20px;
+      gap: clamp(16px,4vw,36px);
+      max-width: 900px;
+      margin: clamp(20px,5vw,50px) auto;
+      padding: 0 clamp(12px,4vw,30px);
+    }
+    @media (min-width: 640px) {
+      .games-grid { grid-template-columns: 1fr 1fr; }
     }
 
-    @media (min-width: 768px) {
-      .games-grid {
-        grid-template-columns: 1fr 1fr;
-      }
-    }
-
+    /* ── GAME CARD ── */
     .game-card {
-      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-      border: 2px solid #334155;
+      background: linear-gradient(145deg, #0f1f0f, #0a1510);
+      border: 1.5px solid rgba(255,255,255,0.08);
       border-radius: 20px;
-      padding: 40px;
+      padding: clamp(20px,5vw,40px) clamp(16px,4vw,32px);
       text-align: center;
       cursor: pointer;
-      transition: all 0.3s ease;
+      transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1), border-color 0.3s, box-shadow 0.3s;
       position: relative;
       overflow: hidden;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      text-decoration: none;
+      display: block;
+      color: white;
     }
-
     .game-card::before {
       content: '';
       position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: linear-gradient(135deg, transparent 0%, rgba(251, 191, 36, 0.1) 100%);
+      inset: 0;
+      background: linear-gradient(145deg, rgba(245,197,24,0.05) 0%, transparent 60%);
       opacity: 0;
-      transition: opacity 0.3s ease;
-      pointer-events: none;
+      transition: opacity 0.3s;
     }
-
     .game-card:hover {
-      transform: translateY(-10px);
-      border-color: #fbbf24;
-      box-shadow: 0 20px 50px rgba(251, 191, 36, 0.2);
+      transform: translateY(-10px) scale(1.02);
+      border-color: rgba(245,197,24,0.6);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.7), 0 0 30px rgba(245,197,24,0.15);
     }
+    .game-card:hover::before { opacity: 1; }
+    .game-card:active { transform: scale(0.97); }
 
-    .game-card:hover::before {
-      opacity: 1;
+    /* Shimmer line at top */
+    .game-card::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, #f5c518, transparent);
+      opacity: 0;
+      transition: opacity 0.3s;
     }
+    .game-card:hover::after { opacity: 1; }
 
-    .game-icon {
-      font-size: 4rem;
-      margin-bottom: 20px;
-      animation: float 3s ease-in-out infinite;
+    .card-icon {
+      font-size: clamp(42px, 12vw, 72px);
+      margin-bottom: clamp(10px, 3vw, 18px);
+      display: block;
+      animation: floatIcon 4s ease-in-out infinite;
     }
-
-    .game-card:hover .game-icon {
-      animation: pulse 0.5s ease-in-out;
+    @keyframes floatIcon {
+      0%,100% { transform: translateY(0); }
+      50%      { transform: translateY(-10px); }
     }
+    .game-card:nth-child(2) .card-icon { animation-delay: -2s; }
 
-    .game-title {
-      font-size: 2rem;
-      font-weight: 800;
-      color: #fff;
-      margin-bottom: 15px;
+    .card-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(22px, 6vw, 36px);
+      font-weight: 900;
+      margin-bottom: 8px;
+      color: white;
     }
-
-    .game-description {
-      color: #cbd5e1;
-      margin-bottom: 20px;
-      line-height: 1.6;
-      font-size: 0.95rem;
-    }
-
-    .game-features {
-      text-align: left;
-      margin: 20px 0;
-      padding: 20px;
-      background: rgba(0, 0, 0, 0.3);
-      border-radius: 10px;
-      border-left: 3px solid #fbbf24;
-    }
-
-    .game-features li {
+    .card-desc {
       color: #94a3b8;
-      margin-bottom: 10px;
+      font-size: clamp(12px, 2.8vw, 15px);
+      line-height: 1.6;
+      margin-bottom: clamp(14px,3vw,22px);
+    }
+
+    /* Feature list */
+    .features {
+      text-align: right;
+      background: rgba(0,0,0,0.3);
+      border-radius: 12px;
+      padding: clamp(10px,2.5vw,16px) clamp(12px,3vw,20px);
+      border-right: 3px solid #f5c518;
+      margin-bottom: clamp(14px,3vw,22px);
+    }
+    .features li {
+      list-style: none;
+      color: #94a3b8;
+      font-size: clamp(11px, 2.5vw, 13px);
+      padding: 3px 0;
       display: flex;
       align-items: center;
+      gap: 8px;
     }
-
-    .game-features li::before {
+    .features li::before {
       content: '✓';
       color: #22c55e;
-      font-weight: bold;
-      margin-left: 10px;
-      font-size: 1.2rem;
-    }
-
-    .btn-play {
-      background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
-      color: #000;
-      padding: 15px 40px;
-      font-size: 1.1rem;
       font-weight: 900;
-      border: none;
-      border-radius: 12px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      margin-top: 20px;
-      text-decoration: none;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    /* Play Button */
+    .play-btn {
       display: inline-block;
+      background: linear-gradient(135deg, #f5c518, #d4a017);
+      color: #000;
+      font-family: 'Cairo', sans-serif;
+      font-size: clamp(12px, 3vw, 16px);
+      font-weight: 900;
+      padding: clamp(10px,2.5vw,16px) clamp(22px,6vw,44px);
+      border-radius: 50px;
       letter-spacing: 1px;
-      box-shadow: 0 4px 15px rgba(251, 191, 36, 0.3);
+      transition: all 0.25s ease;
+      box-shadow: 0 4px 20px rgba(245,197,24,0.35);
       position: relative;
-      z-index: 10;
+      z-index: 2;
     }
-
-    .btn-play:hover {
+    .game-card:hover .play-btn {
+      background: linear-gradient(135deg, #fde047, #f5c518);
+      box-shadow: 0 6px 30px rgba(245,197,24,0.55);
       transform: scale(1.05);
-      box-shadow: 0 6px 25px rgba(251, 191, 36, 0.5);
     }
 
-    .btn-play:active {
-      transform: scale(0.95);
+    /* ── CHIPS DECORATION ── */
+    .chips-row {
+      display: flex;
+      justify-content: center;
+      gap: clamp(6px,2vw,12px);
+      padding: clamp(10px,3vw,20px) 20px;
+    }
+    .deco-chip {
+      width: clamp(28px, 7vw, 44px);
+      height: clamp(28px, 7vw, 44px);
+      border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.2);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 900;
+      font-size: clamp(7px, 1.8vw, 11px);
+      box-shadow: 0 3px 10px rgba(0,0,0,0.5), inset 0 1px 3px rgba(255,255,255,0.15);
+      position: relative;
+      animation: chipFloat 3s ease-in-out infinite;
+    }
+    .deco-chip::before {
+      content:''; position:absolute; inset:3px; border-radius:50%;
+      border:1px dashed rgba(255,255,255,0.3);
+    }
+    .deco-chip:nth-child(1) { background: radial-gradient(circle at 35% 35%, #c084fc, #7e22ce); animation-delay:0s; }
+    .deco-chip:nth-child(2) { background: radial-gradient(circle at 35% 35%, #6ee7b7, #047857); animation-delay:-0.5s; }
+    .deco-chip:nth-child(3) { background: radial-gradient(circle at 35% 35%, #93c5fd, #1d4ed8); animation-delay:-1s; }
+    .deco-chip:nth-child(4) { background: radial-gradient(circle at 35% 35%, #fcd34d, #b45309); animation-delay:-1.5s; }
+    .deco-chip:nth-child(5) { background: radial-gradient(circle at 35% 35%, #fca5a5, #b91c1c); animation-delay:-2s; }
+    @keyframes chipFloat {
+      0%,100% { transform: translateY(0) rotate(0deg); }
+      50%      { transform: translateY(-8px) rotate(10deg); }
     }
 
+    /* ── FOOTER ── */
     footer {
-      background: linear-gradient(135deg, rgba(30, 58, 138, 0.3) 0%, rgba(139, 92, 246, 0.3) 100%);
-      border-top: 3px solid #fbbf24;
-      padding: 30px 20px;
       text-align: center;
-      color: #94a3b8;
-      margin-top: 60px;
+      padding: clamp(16px,4vw,28px) 20px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      color: #334155;
+      font-size: clamp(10px, 2.2vw, 13px);
     }
-
-    .stats-banner {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 20px;
-      max-width: 1000px;
-      margin: 0 auto 40px;
-      padding: 0 20px;
-    }
-
-    .stat-box {
-      background: rgba(251, 191, 36, 0.1);
-      border: 1px solid #fbbf24;
-      border-radius: 12px;
-      padding: 20px;
-      text-align: center;
-    }
-
-    .stat-number {
-      font-size: 2rem;
-      font-weight: bold;
-      color: #fbbf24;
-    }
-
-    .stat-label {
-      color: #94a3b8;
-      font-size: 0.9rem;
-      margin-top: 5px;
-    }
-
-    .feature-highlight {
-      background: linear-gradient(90deg, #fbbf24 0%, transparent 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      font-weight: bold;
-    }
-
-    @media (max-width: 768px) {
-      h1 {
-        font-size: 2rem;
-      }
-
-      header {
-        padding: 30px 15px;
-        margin-bottom: 40px;
-      }
-
-      .game-card {
-        padding: 30px 20px;
-      }
-
-      .games-grid {
-        gap: 25px;
-        margin-bottom: 40px;
-      }
-    }
+    footer .gold { color: #f5c518; }
   </style>
 </head>
 <body>
-  <div class="container-main">
-    <!-- Header -->
-    <header>
-      <h1>🎰 CASINO GAMES PRO 🎰</h1>
-      <p class="subtitle">منصة الألعاب الورقية الاحترافية</p>
-    </header>
+<main>
 
-    <!-- Statistics Banner -->
-    <div class="stats-banner">
-      <div class="stat-box">
-        <div class="stat-number">2</div>
-        <div class="stat-label">لعبة احترافية</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-number">∞</div>
-        <div class="stat-label">جولات لعب</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-number">100%</div>
-        <div class="stat-label">متعة خالصة</div>
-      </div>
+  <!-- HEADER -->
+  <header>
+    <div class="logo-line">
+      <span class="suits">♠️♥️♣️♦️</span>
     </div>
+    <h1>CASINO GAMES PRO</h1>
+    <p class="subtitle">منصة الألعاب الورقية الاحترافية</p>
+  </header>
 
-    <!-- Games Grid -->
-    <div class="games-grid">
-      <!-- High Card Game -->
-      <div class="game-card">
-        <div class="game-icon">🎯</div>
-        <div class="game-title">High Card</div>
-        <div class="game-description">
-          لعبة تنافسية بين لاعبين - من يملك أعلى ورقة يفوز!
-        </div>
-        <div class="game-features">
-          <ul>
-            <li>لعبة سريعة وممتعة</li>
-            <li>تصميم جميل وأنيق</li>
-            <li>إحصائيات مباشرة</li>
-            <li>تأثيرات بصرية احترافية</li>
-          </ul>
-        </div>
-        <a href="./high-card.html" class="btn-play">🎮 العب الآن</a>
-      </div>
-
-      <!-- Black Jack Pro -->
-      <div class="game-card">
-        <div class="game-icon">🎰</div>
-        <div class="game-title">Black Jack PRO</div>
-        <div class="game-description">
-          لعبة بلاك جاك احترافية - نظام فيش كامل ورهانات حقيقية
-        </div>
-        <div class="game-features">
-          <ul>
-            <li>نظام فيش احترافي</li>
-            <li>طاولة حقيقية كالكازينو</li>
-            <li>ميزة Double Down</li>
-            <li>إحصائيات شاملة للجلسة</li>
-          </ul>
-        </div>
-        <a href="./blackjack.html" class="btn-play">💰 العب الآن</a>
-      </div>
-    </div>
+  <!-- STATS STRIP -->
+  <div class="stats-strip">
+    <div class="stat"><div class="num">2</div><div class="lbl">لعبة احترافية</div></div>
+    <div class="stat"><div class="num">∞</div><div class="lbl">جولات لعب</div></div>
+    <div class="stat"><div class="num">100%</div><div class="lbl">متعة بدون توقف</div></div>
   </div>
 
-  <!-- Footer -->
-  <footer>
-    <p>تم تطويره بعناية | جميع الحقوق محفوظة © 2026 | <span class="feature-highlight">Casino Games Pro</span></p>
-  </footer>
+  <!-- CHIPS DECORATION -->
+  <div class="chips-row">
+    <div class="deco-chip">$5</div>
+    <div class="deco-chip">$10</div>
+    <div class="deco-chip">$25</div>
+    <div class="deco-chip">$50</div>
+    <div class="deco-chip">$100</div>
+  </div>
+
+  <!-- GAMES GRID -->
+  <div class="games-grid">
+
+    <!-- HIGH CARD -->
+    <a href="./high-card.html" class="game-card">
+      <span class="card-icon">🎯</span>
+      <div class="card-title">High Card</div>
+      <div class="card-desc">تنافس لاعبان — من يملك أعلى ورقة يأخذ الرهان!</div>
+      <ul class="features">
+        <li>بطاقات حقيقية من أصل 52 ورقة</li>
+        <li>نظام رهانات بالفيش الملوّن</li>
+        <li>فيش دائري بتصميم كازينو</li>
+        <li>تأثيرات وانيميشن احترافية</li>
+        <li>بدون تمرير — ملاءم للموبايل</li>
+      </ul>
+      <div class="play-btn">🎮 العب الآن</div>
+    </a>
+
+    <!-- BLACKJACK -->
+    <a href="./blackjack.html" class="game-card">
+      <span class="card-icon">🎰</span>
+      <div class="card-title">Black Jack PRO</div>
+      <div class="card-desc">بلاك جاك احترافي — فيش، رهانات، وطاولة كازينو حقيقية!</div>
+      <ul class="features">
+        <li>بطاقات حقيقية بخلفية بيضاء واضحة</li>
+        <li>فيش دائري بألوان الكازينو</li>
+        <li>ميزة Hit، Stand، Double Down</li>
+        <li>انيميشن ربح وخسارة احترافي</li>
+        <li>شاشة كاملة بدون سكرول</li>
+      </ul>
+      <div class="play-btn">💰 العب الآن</div>
+    </a>
+
+  </div>
+
+</main>
+
+<!-- FOOTER -->
+<footer>
+  تم تطويره بعناية | جميع الحقوق محفوظة © 2026 | <span class="gold">Casino Games Pro</span>
+</footer>
+
 </body>
 </html>
