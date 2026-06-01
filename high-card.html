@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>High Card Game</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    * {
+      direction: rtl;
+    }
+
+    @keyframes flipCard {
+      0% {
+        transform: rotateY(0deg) scale(1);
+        opacity: 1;
+      }
+      50% {
+        transform: rotateY(90deg) scale(1.05);
+        opacity: 0.7;
+      }
+      100% {
+        transform: rotateY(0deg) scale(1);
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideInRight {
+      0% {
+        transform: translateX(-30px);
+        opacity: 0;
+      }
+      100% {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideInLeft {
+      0% {
+        transform: translateX(30px);
+        opacity: 0;
+      }
+      100% {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes pulse-glow {
+      0%, 100% {
+        box-shadow: 0 0 10px rgba(34, 197, 94, 0);
+      }
+      50% {
+        box-shadow: 0 0 30px rgba(34, 197, 94, 0.8);
+      }
+    }
+
+    @keyframes bounce-card {
+      0%, 100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-10px);
+      }
+    }
+
+    @keyframes winner-pulse {
+      0%, 100% {
+        color: #4ade80;
+        text-shadow: 0 0 10px rgba(74, 222, 128, 0.5);
+      }
+      50% {
+        color: #22c55e;
+        text-shadow: 0 0 20px rgba(74, 222, 128, 0.8);
+      }
+    }
+
+    .card-flip {
+      animation: flipCard 0.6s ease-in-out;
+      perspective: 1000px;
+    }
+
+    .slide-right {
+      animation: slideInRight 0.5s ease-out;
+    }
+
+    .slide-left {
+      animation: slideInLeft 0.5s ease-out;
+    }
+
+    .winner-text {
+      animation: winner-pulse 0.8s ease-in-out;
+    }
+
+    .bounce {
+      animation: bounce-card 0.4s ease-in-out;
+    }
+
+    .card-container {
+      transition: all 0.3s ease;
+      perspective: 1000px;
+    }
+
+    .card-container:hover {
+      transform: scale(1.02);
+    }
+
+    img.card-image {
+      transition: opacity 0.3s ease;
+    }
+
+    .score-update {
+      animation: pulse-glow 0.6s ease-in-out;
+    }
+
+    .card-display-bg {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 12px;
+      padding: 8px;
+    }
+
+    .card-display-bg img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-b from-slate-950 to-slate-900 text-white overflow-x-hidden min-h-screen">
+  <div class="min-h-screen flex flex-col items-center justify-center p-2 sm:p-4">
+    <h1 class="text-2xl sm:text-3xl md:text-5xl font-bold mb-4 text-yellow-400 text-center animate-bounce">
+      🎰 High Card Game 🎰
+    </h1>
+    
+    <div class="flex flex-row flex-wrap justify-center gap-2 sm:gap-4 md:gap-8 mb-8 w-full">
+      <div class="bg-slate-800 p-3 sm:p-4 rounded-lg sm:rounded-2xl w-[45%] max-w-[200px] sm:max-w-[260px] text-center shadow-2xl card-container">
+        <h2 class="text-lg sm:text-xl md:text-2xl font-bold mb-3 sm:mb-4">Player 1</h2>
+        <div class="card-display-bg">
+          <img id="player1-card" src="./assets/back.png" class="rounded-lg sm:rounded-xl card-image" alt="Player 1 Card">
+        </div>
+        <p id="player1-name" class="mt-2 sm:mt-4 text-xs sm:text-sm md:text-lg font-semibold slide-right">
+          Hidden Card
+        </p>
+      </div>
+      <div class="bg-slate-800 p-3 sm:p-4 rounded-lg sm:rounded-2xl w-[45%] max-w-[200px] sm:max-w-[260px] text-center shadow-2xl card-container">
+        <h2 class="text-lg sm:text-xl md:text-2xl font-bold mb-3 sm:mb-4">Player 2</h2>
+        <div class="card-display-bg">
+          <img id="player2-card" src="./assets/back.png" class="rounded-lg sm:rounded-xl card-image" alt="Player 2 Card">
+        </div>
+        <p id="player2-name" class="mt-2 sm:mt-4 text-xs sm:text-sm md:text-lg font-semibold slide-left">
+          Hidden Card
+        </p>
+      </div>
+    </div>
+
+    <h2 id="winner" class="text-xl sm:text-2xl md:text-4xl font-bold mb-4 sm:mb-6 text-green-400 text-center">
+      Press Draw Cards
+    </h2>
+
+    <div class="bg-gradient-to-b from-slate-700 to-slate-800 p-4 sm:p-5 rounded-lg sm:rounded-2xl text-center w-full max-w-sm mx-auto mb-6 border-2 border-yellow-500">
+      <h3 class="text-lg sm:text-2xl md:text-3xl font-bold mb-3 sm:mb-4">Score Board</h3>
+      <p class="text-base sm:text-xl md:text-2xl mb-2">
+        Player 1: <span id="player1-score" class="text-yellow-400 font-bold">0</span>
+      </p>
+      <p class="text-base sm:text-xl md:text-2xl">
+        Player 2: <span id="player2-score" class="text-yellow-400 font-bold">0</span>
+      </p>
+      <div class="bg-black bg-opacity-50 rounded-lg p-3 mt-4">
+        <p class="text-xs sm:text-sm">🎮 Rounds: <span id="round-count">0</span></p>
+        <p class="text-xs sm:text-sm">📊 Win Rate P1: <span id="win-rate">0%</span></p>
+      </div>
+    </div>
+
+    <div class="flex flex-wrap justify-center gap-2 sm:gap-4">
+      <button onclick="drawCards()" class="bg-blue-500 hover:bg-blue-600 px-4 sm:px-6 py-2 sm:py-3 rounded-lg sm:rounded-xl font-bold text-xs sm:text-sm md:text-lg transition-all hover:scale-105 active:scale-95">
+        Draw Cards
+      </button>
+      <button onclick="resetGame()" class="bg-red-500 hover:bg-red-600 px-4 sm:px-6 py-2 sm:py-3 rounded-lg sm:rounded-xl font-bold text-xs sm:text-sm md:text-lg transition-all hover:scale-105 active:scale-95">
+        Reset
+      </button>
+    </div>
+  </div>
+
+  <script>
+    const cards = [
+      ["Ace of Spades", 14, "./assets/ace_of_spades.png"],
+      ["Ace of Hearts", 14, "./assets/ace_of_hearts.png"],
+      ["Ace of Clubs", 14, "./assets/ace_of_clubs.png"],
+      ["Ace of Diamonds", 14, "./assets/ace_of_diamonds.png"],
+      ["King of Spades", 13, "./assets/king_of_spades.png"],
+      ["King of Hearts", 13, "./assets/king_of_hearts.png"],
+      ["King of Clubs", 13, "./assets/king_of_clubs.png"],
+      ["King of Diamonds", 13, "./assets/king_of_diamonds.png"],
+      ["Queen of Spades", 12, "./assets/queen_of_spades.png"],
+      ["Queen of Hearts", 12, "./assets/queen_of_hearts.png"],
+      ["Queen of Clubs", 12, "./assets/queen_of_clubs.png"],
+      ["Queen of Diamonds", 12, "./assets/queen_of_diamonds.png"],
+      ["Jack of Spades", 11, "./assets/jack_of_spades.png"],
+      ["Jack of Hearts", 11, "./assets/jack_of_hearts.png"],
+      ["Jack of Clubs", 11, "./assets/jack_of_clubs.png"],
+      ["Jack of Diamonds", 11, "./assets/jack_of_diamonds.png"],
+      ["10 of Spades", 10, "./assets/10_of_spades.png"],
+      ["10 of Hearts", 10, "./assets/10_of_hearts.png"],
+      ["10 of Clubs", 10, "./assets/10_of_clubs.png"],
+      ["10 of Diamonds", 10, "./assets/10_of_diamonds.png"],
+      ["9 of Spades", 9, "./assets/9_of_spades.png"],
+      ["9 of Hearts", 9, "./assets/9_of_hearts.png"],
+      ["9 of Clubs", 9, "./assets/9_of_clubs.png"],
+      ["9 of Diamonds", 9, "./assets/9_of_diamonds.png"],
+      ["8 of Spades", 8, "./assets/8_of_spades.png"],
+      ["8 of Hearts", 8, "./assets/8_of_hearts.png"],
+      ["8 of Clubs", 8, "./assets/8_of_clubs.png"],
+      ["8 of Diamonds", 8, "./assets/8_of_diamonds.png"],
+      ["7 of Spades", 7, "./assets/7_of_spades.png"],
+      ["7 of Hearts", 7, "./assets/7_of_hearts.png"],
+      ["7 of Clubs", 7, "./assets/7_of_clubs.png"],
+      ["7 of Diamonds", 7, "./assets/7_of_diamonds.png"],
+      ["6 of Spades", 6, "./assets/6_of_spades.png"],
+      ["6 of Hearts", 6, "./assets/6_of_hearts.png"],
+      ["6 of Clubs", 6, "./assets/6_of_clubs.png"],
+      ["6 of Diamonds", 6, "./assets/6_of_diamonds.png"],
+      ["5 of Spades", 5, "./assets/5_of_spades.png"],
+      ["5 of Hearts", 5, "./assets/5_of_hearts.png"],
+      ["5 of Clubs", 5, "./assets/5_of_clubs.png"],
+      ["5 of Diamonds", 5, "./assets/5_of_diamonds.png"],
+      ["4 of Spades", 4, "./assets/4_of_spades.png"],
+      ["4 of Hearts", 4, "./assets/4_of_hearts.png"],
+      ["4 of Clubs", 4, "./assets/4_of_clubs.png"],
+      ["4 of Diamonds", 4, "./assets/4_of_diamonds.png"],
+      ["3 of Spades", 3, "./assets/3_of_spades.png"],
+      ["3 of Hearts", 3, "./assets/3_of_hearts.png"],
+      ["3 of Clubs", 3, "./assets/3_of_clubs.png"],
+      ["3 of Diamonds", 3, "./assets/3_of_diamonds.png"],
+      ["2 of Spades", 2, "./assets/2_of_spades.png"],
+      ["2 of Hearts", 2, "./assets/2_of_hearts.png"],
+      ["2 of Clubs", 2, "./assets/2_of_clubs.png"],
+      ["2 of Diamonds", 2, "./assets/2_of_diamonds.png"]
+    ];
+
+    let player1Score = 0;
+    let player2Score = 0;
+    let roundCount = 0;
+
+    function randomCard() {
+      return cards[Math.floor(Math.random() * cards.length)];
+    }
+
+    function addFlipAnimation(cardElement) {
+      cardElement.classList.remove('card-flip');
+      void cardElement.offsetWidth;
+      cardElement.classList.add('card-flip');
+    }
+
+    function updateStats() {
+      document.getElementById('round-count').innerText = roundCount;
+      const winRate = roundCount > 0 ? Math.round((player1Score / roundCount) * 100) : 0;
+      document.getElementById('win-rate').innerText = winRate + '%';
+    }
+
+    function drawCards() {
+      const p1 = randomCard();
+      const p2 = randomCard();
+
+      const player1CardEl = document.getElementById("player1-card");
+      const player2CardEl = document.getElementById("player2-card");
+      const player1NameEl = document.getElementById("player1-name");
+      const player2NameEl = document.getElementById("player2-name");
+      const winnerEl = document.getElementById("winner");
+
+      addFlipAnimation(player1CardEl);
+      addFlipAnimation(player2CardEl);
+
+      setTimeout(() => {
+        player1CardEl.src = p1[2];
+        player2CardEl.src = p2[2];
+      }, 300);
+
+      player1NameEl.classList.remove('slide-right');
+      player2NameEl.classList.remove('slide-left');
+
+      setTimeout(() => {
+        player1NameEl.innerText = p1[0];
+        player2NameEl.innerText = p2[0];
+        player1NameEl.classList.add('slide-right');
+        player2NameEl.classList.add('slide-left');
+      }, 300);
+
+      let winnerText = "";
+      if (p1[1] > p2[1]) {
+        player1Score++;
+        winnerText = "🎉 Player 1 Wins! 🎉";
+      } else if (p2[1] > p1[1]) {
+        player2Score++;
+        winnerText = "🎉 Player 2 Wins! 🎉";
+      } else {
+        winnerText = "🤝 Draw! 🤝";
+      }
+
+      roundCount++;
+
+      winnerEl.classList.remove('winner-text');
+      setTimeout(() => {
+        winnerEl.innerText = winnerText;
+        winnerEl.classList.add('winner-text');
+      }, 400);
+
+      setTimeout(() => {
+        const player1ScoreEl = document.getElementById("player1-score");
+        const player2ScoreEl = document.getElementById("player2-score");
+        
+        player1ScoreEl.classList.remove('score-update');
+        player2ScoreEl.classList.remove('score-update');
+        
+        void player1ScoreEl.offsetWidth;
+        void player2ScoreEl.offsetWidth;
+        
+        player1ScoreEl.innerText = player1Score;
+        player2ScoreEl.innerText = player2Score;
+        
+        player1ScoreEl.classList.add('score-update');
+        player2ScoreEl.classList.add('score-update');
+        
+        updateStats();
+      }, 500);
+    }
+
+    function resetGame() {
+      player1Score = 0;
+      player2Score = 0;
+      roundCount = 0;
+
+      const player1CardEl = document.getElementById("player1-card");
+      const player2CardEl = document.getElementById("player2-card");
+
+      addFlipAnimation(player1CardEl);
+      addFlipAnimation(player2CardEl);
+
+      setTimeout(() => {
+        player1CardEl.src = "./assets/back.png";
+        player2CardEl.src = "./assets/back.png";
+
+        document.getElementById("player1-name").innerText = "Hidden Card";
+        document.getElementById("player2-name").innerText = "Hidden Card";
+
+        document.getElementById("player1-score").innerText = 0;
+        document.getElementById("player2-score").innerText = 0;
+
+        document.getElementById("winner").innerText = "Press Draw Cards";
+        
+        updateStats();
+      }, 300);
+    }
+
+    updateStats();
+  </script>
+</body>
+</html>
