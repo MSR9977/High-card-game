@@ -1,14 +1,18 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
   <meta
     name="viewport"
     content="width=device-width, initial-scale=1.0"
   >
-  <title>High Card Game</title>
+  <title>لعبة الورق - High Card & Blackjack</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
+    * {
+      direction: rtl;
+    }
+
     @keyframes flipCard {
       0% {
         transform: rotateY(0deg) scale(1);
@@ -75,6 +79,12 @@
       }
     }
 
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+
     .card-flip {
       animation: flipCard 0.6s ease-in-out;
       perspective: 1000px;
@@ -96,6 +106,10 @@
       animation: bounce-card 0.4s ease-in-out;
     }
 
+    .shake {
+      animation: shake 0.4s ease-in-out;
+    }
+
     .card-container {
       transition: all 0.3s ease;
       perspective: 1000px;
@@ -112,110 +126,251 @@
     .score-update {
       animation: pulse-glow 0.6s ease-in-out;
     }
+
+    .tab-button {
+      transition: all 0.3s ease;
+    }
+
+    .tab-button.active {
+      @apply bg-blue-600 border-b-4 border-yellow-400;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .card-deck {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .small-card {
+      width: 60px;
+      height: 90px;
+      border-radius: 8px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .small-card:hover {
+      transform: scale(1.1);
+    }
+
+    .small-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .bust {
+      animation: shake 0.4s ease-in-out;
+      color: #ef4444;
+    }
+
+    .blackjack-score {
+      font-size: 1.5rem;
+      font-weight: bold;
+      margin-top: 10px;
+      padding: 10px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 8px;
+    }
+
+    .btn-disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .stats-box {
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+      border: 2px solid #334155;
+    }
+
+    .game-info {
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid #475569;
+      border-radius: 12px;
+      padding: 12px;
+      margin: 8px 0;
+    }
   </style>
 </head>
-<body class="bg-slate-900 text-white overflow-x-hidden">
-  <div
-    class="min-h-screen flex flex-col items-center justify-center p-4"
-  >
-    <h1
-      class="text-3xl md:text-5xl font-bold mb-8 text-yellow-400 text-center"
-    >
-      High Card Game
+<body class="bg-gradient-to-b from-slate-950 to-slate-900 text-white overflow-x-hidden min-h-screen">
+  <div class="min-h-screen flex flex-col items-center justify-center p-4">
+    <!-- عنوان التطبيق -->
+    <h1 class="text-3xl md:text-5xl font-bold mb-4 text-yellow-400 text-center animate-bounce">
+      🎰 لعبة الورق 🎰
     </h1>
-    <div
-      class="flex flex-row flex-wrap justify-center gap-4 md:gap-8 mb-8 w-full"
-    >
-      <div
-        class="bg-slate-800 p-4 rounded-2xl w-[45%] max-w-[260px] text-center shadow-2xl card-container"
+    
+    <!-- أزرار التبويب -->
+    <div class="flex flex-wrap gap-2 mb-6 justify-center">
+      <button 
+        onclick="switchGame('highcard')"
+        class="tab-button active bg-blue-500 hover:bg-blue-600 px-6 py-3 rounded-xl font-bold text-sm md:text-lg transition-all"
       >
-        <h2 class="text-xl md:text-2xl font-bold mb-4">
-          Player 1
-        </h2>
-        <div class="bg-white rounded-2xl p-2">
-          <img
-            id="player1-card"
-            src="./assets/back.png"
-            class="w-full rounded-xl card-image"
+        High Card
+      </button>
+      <button 
+        onclick="switchGame('blackjack')"
+        class="tab-button bg-purple-500 hover:bg-purple-600 px-6 py-3 rounded-xl font-bold text-sm md:text-lg transition-all"
+      >
+        Black Jack
+      </button>
+    </div>
+
+    <!-- لعبة High Card -->
+    <div id="highcard-game" class="tab-content active w-full max-w-2xl">
+      <div class="flex flex-row flex-wrap justify-center gap-4 md:gap-8 mb-8 w-full">
+        <div class="bg-slate-800 p-4 rounded-2xl w-[45%] max-w-[260px] text-center shadow-2xl card-container">
+          <h2 class="text-xl md:text-2xl font-bold mb-4">Player 1</h2>
+          <div class="bg-gradient-to-b from-white to-gray-200 rounded-2xl p-2">
+            <img
+              id="player1-card"
+              src="./assets/back.png"
+              class="w-full rounded-xl card-image"
+            >
+          </div>
+          <p
+            id="player1-name"
+            class="mt-4 text-sm md:text-lg font-semibold slide-right"
           >
+            Hidden Card
+          </p>
         </div>
-        <p
-          id="player1-name"
-          class="mt-4 text-sm md:text-lg font-semibold slide-right"
-        >
-          Hidden Card
-        </p>
+        <div class="bg-slate-800 p-4 rounded-2xl w-[45%] max-w-[260px] text-center shadow-2xl card-container">
+          <h2 class="text-xl md:text-2xl font-bold mb-4">Player 2</h2>
+          <div class="bg-gradient-to-b from-white to-gray-200 rounded-2xl p-2">
+            <img
+              id="player2-card"
+              src="./assets/back.png"
+              class="w-full rounded-xl card-image"
+            >
+          </div>
+          <p
+            id="player2-name"
+            class="mt-4 text-sm md:text-lg font-semibold slide-left"
+          >
+            Hidden Card
+          </p>
+        </div>
       </div>
-      <div
-        class="bg-slate-800 p-4 rounded-2xl w-[45%] max-w-[260px] text-center shadow-2xl card-container"
+      <h2
+        id="winner"
+        class="text-2xl md:text-4xl font-bold mb-6 text-green-400 text-center"
       >
-        <h2 class="text-xl md:text-2xl font-bold mb-4">
-          Player 2
-        </h2>
-        <div class="bg-white rounded-2xl p-2">
-          <img
-            id="player2-card"
-            src="./assets/back.png"
-            class="w-full rounded-xl card-image"
-          >
-        </div>
-        <p
-          id="player2-name"
-          class="mt-4 text-sm md:text-lg font-semibold slide-left"
-        >
-          Hidden Card
+        Press Draw Cards
+      </h2>
+      <div class="stats-box p-5 rounded-2xl text-center w-full max-w-sm mx-auto mb-6">
+        <h3 class="text-2xl md:text-3xl font-bold mb-4">Score Board</h3>
+        <p class="text-xl md:text-2xl mb-2">
+          Player 1: <span id="player1-score" class="text-yellow-400">0</span>
         </p>
+        <p class="text-xl md:text-2xl">
+          Player 2: <span id="player2-score" class="text-yellow-400">0</span>
+        </p>
+        <div class="game-info mt-4">
+          <p class="text-sm">🎮 عدد الجولات: <span id="round-count">0</span></p>
+          <p class="text-sm">📊 نسبة الفوز P1: <span id="win-rate">0%</span></p>
+        </div>
+      </div>
+      <div class="flex flex-wrap justify-center gap-4">
+        <button
+          onclick="drawCards()"
+          class="bg-blue-500 hover:bg-blue-600 px-6 py-3 rounded-xl font-bold text-sm md:text-lg transition-all hover:scale-105 active:scale-95"
+        >
+          Draw Cards
+        </button>
+        <button
+          onclick="resetGame('highcard')"
+          class="bg-red-500 hover:bg-red-600 px-6 py-3 rounded-xl font-bold text-sm md:text-lg transition-all hover:scale-105 active:scale-95"
+        >
+          Reset
+        </button>
       </div>
     </div>
-    <h2
-      id="winner"
-      class="text-2xl md:text-4xl font-bold mb-6 text-green-400 text-center"
-    >
-      Press Draw Cards
-    </h2>
-    <div
-      class="bg-slate-800 p-5 rounded-2xl text-center w-full max-w-sm"
-    >
-      <h3 class="text-2xl md:text-3xl font-bold mb-4">
-        Score Board
-      </h3>
-      <p class="text-xl md:text-2xl mb-2">
-        Player 1:
-        <span
-          id="player1-score"
-          class="text-yellow-400"
-        >
-          0
-        </span>
-      </p>
-      <p class="text-xl md:text-2xl">
-        Player 2:
-        <span
-          id="player2-score"
-          class="text-yellow-400"
-        >
-          0
-        </span>
-      </p>
-    </div>
-    <div
-      class="mt-8 flex flex-wrap justify-center gap-4"
-    >
-      <button
-        onclick="drawCards()"
-        class="bg-blue-500 hover:bg-blue-600 px-6 py-3 rounded-xl font-bold text-sm md:text-lg transition-all hover:scale-105 active:scale-95"
-      >
-        Draw Cards
-      </button>
-      <button
-        onclick="resetGame()"
-        class="bg-red-500 hover:bg-red-600 px-6 py-3 rounded-xl font-bold text-sm md:text-lg transition-all hover:scale-105 active:scale-95"
-      >
-        Reset
-      </button>
+
+    <!-- لعبة Black Jack -->
+    <div id="blackjack-game" class="tab-content w-full max-w-4xl">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <!-- يد الديلر -->
+        <div class="bg-slate-800 p-6 rounded-2xl shadow-2xl">
+          <h3 class="text-2xl font-bold mb-4 text-center">♠️ Dealer</h3>
+          <div class="card-deck" id="dealer-cards">
+          </div>
+          <div class="blackjack-score" id="dealer-score">Score: 0</div>
+          <div class="game-info" id="dealer-status"></div>
+        </div>
+
+        <!-- يد اللاعب -->
+        <div class="bg-slate-800 p-6 rounded-2xl shadow-2xl">
+          <h3 class="text-2xl font-bold mb-4 text-center">♥️ Player</h3>
+          <div class="card-deck" id="player-cards">
+          </div>
+          <div class="blackjack-score" id="player-score">Score: 0</div>
+          <div class="game-info" id="player-status"></div>
+        </div>
+      </div>
+
+      <!-- أزرار اللعب -->
+      <div class="bg-slate-800 p-6 rounded-2xl shadow-2xl mb-6">
+        <div id="bj-buttons" class="flex flex-wrap gap-4 justify-center">
+          <button
+            onclick="bjDeal()"
+            class="bg-green-500 hover:bg-green-600 px-6 py-3 rounded-xl font-bold text-lg transition-all hover:scale-105 active:scale-95"
+          >
+            Deal
+          </button>
+          <button
+            onclick="bjHit()"
+            class="bg-blue-500 hover:bg-blue-600 px-6 py-3 rounded-xl font-bold text-lg transition-all hover:scale-105 active:scale-95 btn-disabled"
+            id="bj-hit-btn"
+            disabled
+          >
+            Hit
+          </button>
+          <button
+            onclick="bjStand()"
+            class="bg-yellow-600 hover:bg-yellow-700 px-6 py-3 rounded-xl font-bold text-lg transition-all hover:scale-105 active:scale-95 btn-disabled"
+            id="bj-stand-btn"
+            disabled
+          >
+            Stand
+          </button>
+          <button
+            onclick="resetGame('blackjack')"
+            class="bg-red-500 hover:bg-red-600 px-6 py-3 rounded-xl font-bold text-lg transition-all hover:scale-105 active:scale-95"
+          >
+            New Game
+          </button>
+        </div>
+      </div>
+
+      <!-- إحصائيات البلاك جاك -->
+      <div class="stats-box p-5 rounded-2xl text-center w-full max-w-sm mx-auto">
+        <h3 class="text-2xl font-bold mb-4">📊 Statistics</h3>
+        <div class="game-info">
+          <p class="text-lg">Wins: <span id="bj-wins" class="text-green-400 font-bold">0</span></p>
+          <p class="text-lg">Losses: <span id="bj-losses" class="text-red-400 font-bold">0</span></p>
+          <p class="text-lg">Draws: <span id="bj-draws" class="text-yellow-400 font-bold">0</span></p>
+        </div>
+      </div>
+
+      <!-- رسالة النتيجة -->
+      <h2 id="bj-result" class="text-2xl md:text-4xl font-bold mt-8 text-center text-green-400">
+        Click Deal to Start
+      </h2>
     </div>
   </div>
+
   <script>
+    // ======================== High Card Game ========================
     const cards = [
       ["Ace of Spades", 14, "./assets/ace_of_spades.png"],
       ["Ace of Hearts", 14, "./assets/ace_of_hearts.png"],
@@ -237,62 +392,58 @@
       ["10 of Hearts", 10, "./assets/10_of_hearts.png"],
       ["10 of Clubs", 10, "./assets/10_of_clubs.png"],
       ["10 of Diamonds", 10, "./assets/10_of_diamonds.png"],
-
       ["9 of Spades", 9, "./assets/9_of_spades.png"],
       ["9 of Hearts", 9, "./assets/9_of_hearts.png"],
       ["9 of Clubs", 9, "./assets/9_of_clubs.png"],
       ["9 of Diamonds", 9, "./assets/9_of_diamonds.png"],
-
       ["8 of Spades", 8, "./assets/8_of_spades.png"],
       ["8 of Hearts", 8, "./assets/8_of_hearts.png"],
       ["8 of Clubs", 8, "./assets/8_of_clubs.png"],
       ["8 of Diamonds", 8, "./assets/8_of_diamonds.png"],
-
       ["7 of Spades", 7, "./assets/7_of_spades.png"],
       ["7 of Hearts", 7, "./assets/7_of_hearts.png"],
       ["7 of Clubs", 7, "./assets/7_of_clubs.png"],
       ["7 of Diamonds", 7, "./assets/7_of_diamonds.png"],
-
       ["6 of Spades", 6, "./assets/6_of_spades.png"],
       ["6 of Hearts", 6, "./assets/6_of_hearts.png"],
       ["6 of Clubs", 6, "./assets/6_of_clubs.png"],
       ["6 of Diamonds", 6, "./assets/6_of_diamonds.png"],
-
       ["5 of Spades", 5, "./assets/5_of_spades.png"],
       ["5 of Hearts", 5, "./assets/5_of_hearts.png"],
       ["5 of Clubs", 5, "./assets/5_of_clubs.png"],
       ["5 of Diamonds", 5, "./assets/5_of_diamonds.png"],
-
       ["4 of Spades", 4, "./assets/4_of_spades.png"],
       ["4 of Hearts", 4, "./assets/4_of_hearts.png"],
       ["4 of Clubs", 4, "./assets/4_of_clubs.png"],
       ["4 of Diamonds", 4, "./assets/4_of_diamonds.png"],
-
       ["3 of Spades", 3, "./assets/3_of_spades.png"],
       ["3 of Hearts", 3, "./assets/3_of_hearts.png"],
       ["3 of Clubs", 3, "./assets/3_of_clubs.png"],
       ["3 of Diamonds", 3, "./assets/3_of_diamonds.png"],
-
       ["2 of Spades", 2, "./assets/2_of_spades.png"],
       ["2 of Hearts", 2, "./assets/2_of_hearts.png"],
       ["2 of Clubs", 2, "./assets/2_of_clubs.png"],
       ["2 of Diamonds", 2, "./assets/2_of_diamonds.png"]
-
     ]
 
     let player1Score = 0
     let player2Score = 0
+    let roundCount = 0
 
     function randomCard() {
-      return cards[
-        Math.floor(Math.random() * cards.length)
-      ]
+      return cards[Math.floor(Math.random() * cards.length)]
     }
 
     function addFlipAnimation(cardElement) {
       cardElement.classList.remove('card-flip')
-      void cardElement.offsetWidth // Trigger reflow to restart animation
+      void cardElement.offsetWidth
       cardElement.classList.add('card-flip')
+    }
+
+    function updateStats() {
+      document.getElementById('round-count').innerText = roundCount
+      const winRate = roundCount > 0 ? Math.round((player1Score / roundCount) * 100) : 0
+      document.getElementById('win-rate').innerText = winRate + '%'
     }
 
     function drawCards() {
@@ -305,17 +456,14 @@
       const player2NameEl = document.getElementById("player2-name")
       const winnerEl = document.getElementById("winner")
 
-      // Add flip animation to cards
       addFlipAnimation(player1CardEl)
       addFlipAnimation(player2CardEl)
 
-      // Update cards after animation
       setTimeout(() => {
         player1CardEl.src = p1[2]
         player2CardEl.src = p2[2]
       }, 300)
 
-      // Update names with animation
       player1NameEl.classList.remove('slide-right')
       player2NameEl.classList.remove('slide-left')
 
@@ -326,7 +474,6 @@
         player2NameEl.classList.add('slide-left')
       }, 300)
 
-      // Determine winner
       let winnerText = ""
       if (p1[1] > p2[1]) {
         player1Score++
@@ -338,14 +485,14 @@
         winnerText = "🤝 Draw! 🤝"
       }
 
-      // Update winner text with animation
+      roundCount++
+
       winnerEl.classList.remove('winner-text')
       setTimeout(() => {
         winnerEl.innerText = winnerText
         winnerEl.classList.add('winner-text')
       }, 400)
 
-      // Update scores with animation
       setTimeout(() => {
         const player1ScoreEl = document.getElementById("player1-score")
         const player2ScoreEl = document.getElementById("player2-score")
@@ -361,34 +508,264 @@
         
         player1ScoreEl.classList.add('score-update')
         player2ScoreEl.classList.add('score-update')
+        
+        updateStats()
       }, 500)
     }
 
-    function resetGame() {
-      player1Score = 0
-      player2Score = 0
+    function resetGame(game) {
+      if (game === 'highcard') {
+        player1Score = 0
+        player2Score = 0
+        roundCount = 0
 
-      const player1CardEl = document.getElementById("player1-card")
-      const player2CardEl = document.getElementById("player2-card")
+        const player1CardEl = document.getElementById("player1-card")
+        const player2CardEl = document.getElementById("player2-card")
 
-      // Add flip animation when resetting
-      addFlipAnimation(player1CardEl)
-      addFlipAnimation(player2CardEl)
+        addFlipAnimation(player1CardEl)
+        addFlipAnimation(player2CardEl)
 
-      setTimeout(() => {
-        player1CardEl.src = "./assets/back.png"
-        player2CardEl.src = "./assets/back.png"
+        setTimeout(() => {
+          player1CardEl.src = "./assets/back.png"
+          player2CardEl.src = "./assets/back.png"
 
-        document.getElementById("player1-name").innerText = "Hidden Card"
-        document.getElementById("player2-name").innerText = "Hidden Card"
+          document.getElementById("player1-name").innerText = "Hidden Card"
+          document.getElementById("player2-name").innerText = "Hidden Card"
 
-        document.getElementById("player1-score").innerText = 0
-        document.getElementById("player2-score").innerText = 0
+          document.getElementById("player1-score").innerText = 0
+          document.getElementById("player2-score").innerText = 0
 
-        document.getElementById("winner").innerText = "Press Draw Cards"
-      }, 300)
+          document.getElementById("winner").innerText = "Press Draw Cards"
+          
+          updateStats()
+        }, 300)
+      } else if (game === 'blackjack') {
+        bjResetGame()
+      }
     }
 
+    // ======================== Black Jack Game ========================
+    let bjDeck = []
+    let playerHand = []
+    let dealerHand = []
+    let gameActive = false
+    let bjWins = 0
+    let bjLosses = 0
+    let bjDraws = 0
+
+    function createDeck() {
+      return [...cards]
+    }
+
+    function shuffleDeck(deck) {
+      for (let i = deck.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [deck[i], deck[j]] = [deck[j], deck[i]]
+      }
+      return deck
+    }
+
+    function dealCard() {
+      if (bjDeck.length < 10) {
+        bjDeck = shuffleDeck(createDeck())
+      }
+      return bjDeck.pop()
+    }
+
+    function getCardValue(card) {
+      const value = card[1]
+      if (value === 14) return 11 // Ace
+      if (value >= 11) return 10 // Face cards
+      return value
+    }
+
+    function calculateScore(hand) {
+      let score = 0
+      let aces = 0
+
+      for (let card of hand) {
+        if (card[1] === 14) aces++
+        score += getCardValue(card)
+      }
+
+      while (score > 21 && aces > 0) {
+        score -= 10
+        aces--
+      }
+
+      return score
+    }
+
+    function displayCards(hand, containerId) {
+      const container = document.getElementById(containerId)
+      container.innerHTML = ''
+      
+      for (let card of hand) {
+        const cardDiv = document.createElement('div')
+        cardDiv.className = 'small-card'
+        cardDiv.innerHTML = `<img src="${card[2]}" alt="${card[0]}">`
+        container.appendChild(cardDiv)
+      }
+    }
+
+    function bjDeal() {
+      playerHand = [dealCard(), dealCard()]
+      dealerHand = [dealCard(), dealCard()]
+      gameActive = true
+
+      displayCards(playerHand, 'player-cards')
+      displayCards([dealerHand[0]], 'dealer-cards') // إخفاء الورقة الثانية
+
+      const playerScore = calculateScore(playerHand)
+      document.getElementById('player-score').innerText = `Score: ${playerScore}`
+      document.getElementById('dealer-score').innerText = `Score: ${calculateScore([dealerHand[0]])}`
+
+      // تفعيل أزرار اللعب
+      document.getElementById('bj-hit-btn').disabled = false
+      document.getElementById('bj-stand-btn').disabled = false
+      document.getElementById('bj-hit-btn').classList.remove('btn-disabled')
+      document.getElementById('bj-stand-btn').classList.remove('btn-disabled')
+
+      document.getElementById('bj-result').innerText = 'Game Started'
+      document.getElementById('player-status').innerText = ''
+      document.getElementById('dealer-status').innerText = ''
+
+      // التحقق من البلاك جاك
+      if (playerScore === 21) {
+        bjStand()
+      }
+    }
+
+    function bjHit() {
+      if (!gameActive) return
+
+      playerHand.push(dealCard())
+      displayCards(playerHand, 'player-cards')
+
+      const playerScore = calculateScore(playerHand)
+      document.getElementById('player-score').innerText = `Score: ${playerScore}`
+
+      if (playerScore > 21) {
+        document.getElementById('player-status').innerText = '❌ BUST!'
+        document.getElementById('player-status').classList.add('bust')
+        gameActive = false
+        finishBJGame()
+      }
+    }
+
+    function bjStand() {
+      if (!gameActive) return
+
+      gameActive = false
+      document.getElementById('bj-hit-btn').disabled = true
+      document.getElementById('bj-stand-btn').disabled = true
+      document.getElementById('bj-hit-btn').classList.add('btn-disabled')
+      document.getElementById('bj-stand-btn').classList.add('btn-disabled')
+
+      // إظهار ورقة الديلر
+      displayCards(dealerHand, 'dealer-cards')
+      let dealerScore = calculateScore(dealerHand)
+      document.getElementById('dealer-score').innerText = `Score: ${dealerScore}`
+
+      // الديلر يأخذ ورقات حتى يصل إلى 17 على الأقل
+      while (dealerScore < 17) {
+        dealerHand.push(dealCard())
+        displayCards(dealerHand, 'dealer-cards')
+        dealerScore = calculateScore(dealerHand)
+        document.getElementById('dealer-score').innerText = `Score: ${dealerScore}`
+      }
+
+      finishBJGame()
+    }
+
+    function finishBJGame() {
+      const playerScore = calculateScore(playerHand)
+      const dealerScore = calculateScore(dealerHand)
+
+      let result = ''
+      
+      if (playerScore > 21) {
+        result = '😢 You Bust! Dealer Wins!'
+        bjLosses++
+        document.getElementById('bj-result').innerText = result
+      } else if (dealerScore > 21) {
+        result = '🎉 Dealer Bust! You Win!'
+        bjWins++
+        document.getElementById('bj-result').innerText = result
+      } else if (playerScore > dealerScore) {
+        result = '🎉 You Win!'
+        bjWins++
+        document.getElementById('bj-result').innerText = result
+      } else if (dealerScore > playerScore) {
+        result = '😢 Dealer Wins!'
+        bjLosses++
+        document.getElementById('bj-result').innerText = result
+      } else {
+        result = '🤝 Draw!'
+        bjDraws++
+        document.getElementById('bj-result').innerText = result
+      }
+
+      document.getElementById('bj-wins').innerText = bjWins
+      document.getElementById('bj-losses').innerText = bjLosses
+      document.getElementById('bj-draws').innerText = bjDraws
+
+      if (dealerScore <= 21) {
+        document.getElementById('dealer-status').innerText = `✅ Score: ${dealerScore}`
+      }
+    }
+
+    function bjResetGame() {
+      playerHand = []
+      dealerHand = []
+      gameActive = false
+      bjWins = 0
+      bjLosses = 0
+      bjDraws = 0
+
+      document.getElementById('player-cards').innerHTML = ''
+      document.getElementById('dealer-cards').innerHTML = ''
+      document.getElementById('player-score').innerText = 'Score: 0'
+      document.getElementById('dealer-score').innerText = 'Score: 0'
+      document.getElementById('bj-result').innerText = 'Click Deal to Start'
+      document.getElementById('player-status').innerText = ''
+      document.getElementById('dealer-status').innerText = ''
+      document.getElementById('bj-wins').innerText = '0'
+      document.getElementById('bj-losses').innerText = '0'
+      document.getElementById('bj-draws').innerText = '0'
+
+      document.getElementById('bj-hit-btn').disabled = true
+      document.getElementById('bj-stand-btn').disabled = true
+      document.getElementById('bj-hit-btn').classList.add('btn-disabled')
+      document.getElementById('bj-stand-btn').classList.add('btn-disabled')
+    }
+
+    // ======================== Tab Switching ========================
+    function switchGame(game) {
+      // إخفاء جميع ألعاب
+      document.getElementById('highcard-game').classList.remove('active')
+      document.getElementById('blackjack-game').classList.remove('active')
+
+      // إزالة active من جميع الأزرار
+      document.querySelectorAll('.tab-button').forEach(btn => {
+        btn.classList.remove('active')
+      })
+
+      // إظهار اللعبة المطلوبة وتفعيل الزر
+      if (game === 'highcard') {
+        document.getElementById('highcard-game').classList.add('active')
+        document.querySelectorAll('.tab-button')[0].classList.add('active')
+      } else {
+        document.getElementById('blackjack-game').classList.add('active')
+        document.querySelectorAll('.tab-button')[1].classList.add('active')
+      }
+    }
+
+    // تهيئة البيانات الأولية
+    window.addEventListener('load', () => {
+      bjDeck = shuffleDeck(createDeck())
+      updateStats()
+    })
   </script>
 
 </body>
