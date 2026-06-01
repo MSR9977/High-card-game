@@ -148,15 +148,30 @@
       gap: 8px;
       flex-wrap: wrap;
       justify-content: center;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 15px;
+      border-radius: 12px;
+      min-height: 120px;
+      align-items: center;
+      margin-bottom: 10px;
     }
 
     .small-card {
-      width: 60px;
-      height: 90px;
-      border-radius: 8px;
+      width: 50px;
+      height: 75px;
+      border-radius: 6px;
       overflow: hidden;
       cursor: pointer;
       transition: transform 0.2s;
+      background: white;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    @media (min-width: 640px) {
+      .small-card {
+        width: 60px;
+        height: 90px;
+      }
     }
 
     .small-card:hover {
@@ -175,12 +190,18 @@
     }
 
     .blackjack-score {
-      font-size: 1.5rem;
+      font-size: 1.3rem;
       font-weight: bold;
-      margin-top: 10px;
       padding: 10px;
       background: rgba(0, 0, 0, 0.3);
       border-radius: 8px;
+      border-left: 4px solid #fbbf24;
+    }
+
+    @media (min-width: 768px) {
+      .blackjack-score {
+        font-size: 1.5rem;
+      }
     }
 
     .btn-disabled {
@@ -199,13 +220,92 @@
       border-radius: 12px;
       padding: 12px;
       margin: 8px 0;
+      font-size: 0.9rem;
+    }
+
+    @media (min-width: 640px) {
+      .game-info {
+        font-size: 1rem;
+      }
+    }
+
+    /* Responsive adjustments for BlackJack */
+    #blackjack-game .grid {
+      gap: 1rem;
+    }
+
+    @media (min-width: 768px) {
+      #blackjack-game .grid {
+        gap: 1.5rem;
+      }
+    }
+
+    #blackjack-game .bg-slate-800 {
+      padding: 1rem;
+    }
+
+    @media (min-width: 768px) {
+      #blackjack-game .bg-slate-800 {
+        padding: 1.5rem;
+      }
+    }
+
+    #blackjack-game h3 {
+      font-size: 1.5rem;
+    }
+
+    @media (min-width: 768px) {
+      #blackjack-game h3 {
+        font-size: 1.875rem;
+      }
+    }
+
+    .button-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      justify-content: center;
+    }
+
+    @media (min-width: 768px) {
+      .button-group {
+        gap: 1rem;
+      }
+    }
+
+    .game-button {
+      padding: 0.75rem 1rem;
+      font-size: 0.9rem;
+      border-radius: 0.5rem;
+    }
+
+    @media (min-width: 768px) {
+      .game-button {
+        padding: 0.75rem 1.5rem;
+        font-size: 1rem;
+        border-radius: 0.75rem;
+      }
+    }
+
+    /* White background for cards display */
+    .card-display-bg {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 12px;
+      padding: 8px;
+    }
+
+    .card-display-bg img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border-radius: 8px;
     }
   </style>
 </head>
 <body class="bg-gradient-to-b from-slate-950 to-slate-900 text-white overflow-x-hidden min-h-screen">
-  <div class="min-h-screen flex flex-col items-center justify-center p-4">
+  <div class="min-h-screen flex flex-col items-center justify-center p-2 sm:p-4">
     <!-- عنوان التطبيق -->
-    <h1 class="text-3xl md:text-5xl font-bold mb-4 text-yellow-400 text-center animate-bounce">
+    <h1 class="text-2xl sm:text-3xl md:text-5xl font-bold mb-4 text-yellow-400 text-center animate-bounce">
       🎰 لعبة الورق 🎰
     </h1>
     
@@ -213,13 +313,13 @@
     <div class="flex flex-wrap gap-2 mb-6 justify-center">
       <button 
         onclick="switchGame('highcard')"
-        class="tab-button active bg-blue-500 hover:bg-blue-600 px-6 py-3 rounded-xl font-bold text-sm md:text-lg transition-all"
+        class="tab-button active bg-blue-500 hover:bg-blue-600 px-4 sm:px-6 py-2 sm:py-3 rounded-lg sm:rounded-xl font-bold text-xs sm:text-sm md:text-lg transition-all"
       >
         High Card
       </button>
       <button 
         onclick="switchGame('blackjack')"
-        class="tab-button bg-purple-500 hover:bg-purple-600 px-6 py-3 rounded-xl font-bold text-sm md:text-lg transition-all"
+        class="tab-button bg-purple-500 hover:bg-purple-600 px-4 sm:px-6 py-2 sm:py-3 rounded-lg sm:rounded-xl font-bold text-xs sm:text-sm md:text-lg transition-all"
       >
         Black Jack
       </button>
@@ -227,35 +327,37 @@
 
     <!-- لعبة High Card -->
     <div id="highcard-game" class="tab-content active w-full max-w-2xl">
-      <div class="flex flex-row flex-wrap justify-center gap-4 md:gap-8 mb-8 w-full">
-        <div class="bg-slate-800 p-4 rounded-2xl w-[45%] max-w-[260px] text-center shadow-2xl card-container">
-          <h2 class="text-xl md:text-2xl font-bold mb-4">Player 1</h2>
-          <div class="bg-gradient-to-b from-white to-gray-200 rounded-2xl p-2">
+      <div class="flex flex-row flex-wrap justify-center gap-2 sm:gap-4 md:gap-8 mb-8 w-full">
+        <div class="bg-slate-800 p-3 sm:p-4 rounded-lg sm:rounded-2xl w-[45%] max-w-[200px] sm:max-w-[260px] text-center shadow-2xl card-container">
+          <h2 class="text-lg sm:text-xl md:text-2xl font-bold mb-3 sm:mb-4">Player 1</h2>
+          <div class="card-display-bg">
             <img
               id="player1-card"
               src="./assets/back.png"
-              class="w-full rounded-xl card-image"
+              class="rounded-lg sm:rounded-xl card-image"
+              alt="Player 1 Card"
             >
           </div>
           <p
             id="player1-name"
-            class="mt-4 text-sm md:text-lg font-semibold slide-right"
+            class="mt-2 sm:mt-4 text-xs sm:text-sm md:text-lg font-semibold slide-right"
           >
             Hidden Card
           </p>
         </div>
-        <div class="bg-slate-800 p-4 rounded-2xl w-[45%] max-w-[260px] text-center shadow-2xl card-container">
-          <h2 class="text-xl md:text-2xl font-bold mb-4">Player 2</h2>
-          <div class="bg-gradient-to-b from-white to-gray-200 rounded-2xl p-2">
+        <div class="bg-slate-800 p-3 sm:p-4 rounded-lg sm:rounded-2xl w-[45%] max-w-[200px] sm:max-w-[260px] text-center shadow-2xl card-container">
+          <h2 class="text-lg sm:text-xl md:text-2xl font-bold mb-3 sm:mb-4">Player 2</h2>
+          <div class="card-display-bg">
             <img
               id="player2-card"
               src="./assets/back.png"
-              class="w-full rounded-xl card-image"
+              class="rounded-lg sm:rounded-xl card-image"
+              alt="Player 2 Card"
             >
           </div>
           <p
             id="player2-name"
-            class="mt-4 text-sm md:text-lg font-semibold slide-left"
+            class="mt-2 sm:mt-4 text-xs sm:text-sm md:text-lg font-semibold slide-left"
           >
             Hidden Card
           </p>
@@ -263,33 +365,33 @@
       </div>
       <h2
         id="winner"
-        class="text-2xl md:text-4xl font-bold mb-6 text-green-400 text-center"
+        class="text-xl sm:text-2xl md:text-4xl font-bold mb-4 sm:mb-6 text-green-400 text-center"
       >
         Press Draw Cards
       </h2>
-      <div class="stats-box p-5 rounded-2xl text-center w-full max-w-sm mx-auto mb-6">
-        <h3 class="text-2xl md:text-3xl font-bold mb-4">Score Board</h3>
-        <p class="text-xl md:text-2xl mb-2">
+      <div class="stats-box p-4 sm:p-5 rounded-lg sm:rounded-2xl text-center w-full max-w-sm mx-auto mb-6">
+        <h3 class="text-lg sm:text-2xl md:text-3xl font-bold mb-3 sm:mb-4">Score Board</h3>
+        <p class="text-base sm:text-xl md:text-2xl mb-2">
           Player 1: <span id="player1-score" class="text-yellow-400">0</span>
         </p>
-        <p class="text-xl md:text-2xl">
+        <p class="text-base sm:text-xl md:text-2xl">
           Player 2: <span id="player2-score" class="text-yellow-400">0</span>
         </p>
         <div class="game-info mt-4">
-          <p class="text-sm">🎮 عدد الجولات: <span id="round-count">0</span></p>
-          <p class="text-sm">📊 نسبة الفوز P1: <span id="win-rate">0%</span></p>
+          <p class="text-xs sm:text-sm">🎮 عدد الجولات: <span id="round-count">0</span></p>
+          <p class="text-xs sm:text-sm">📊 نسبة الفوز P1: <span id="win-rate">0%</span></p>
         </div>
       </div>
-      <div class="flex flex-wrap justify-center gap-4">
+      <div class="button-group mb-4">
         <button
           onclick="drawCards()"
-          class="bg-blue-500 hover:bg-blue-600 px-6 py-3 rounded-xl font-bold text-sm md:text-lg transition-all hover:scale-105 active:scale-95"
+          class="game-button bg-blue-500 hover:bg-blue-600 font-bold transition-all hover:scale-105 active:scale-95"
         >
           Draw Cards
         </button>
         <button
           onclick="resetGame('highcard')"
-          class="bg-red-500 hover:bg-red-600 px-6 py-3 rounded-xl font-bold text-sm md:text-lg transition-all hover:scale-105 active:scale-95"
+          class="game-button bg-red-500 hover:bg-red-600 font-bold transition-all hover:scale-105 active:scale-95"
         >
           Reset
         </button>
@@ -297,11 +399,11 @@
     </div>
 
     <!-- لعبة Black Jack -->
-    <div id="blackjack-game" class="tab-content w-full max-w-4xl">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+    <div id="blackjack-game" class="tab-content w-full">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 max-w-4xl mx-auto px-2 sm:px-0">
         <!-- يد الديلر -->
-        <div class="bg-slate-800 p-6 rounded-2xl shadow-2xl">
-          <h3 class="text-2xl font-bold mb-4 text-center">♠️ Dealer</h3>
+        <div class="bg-slate-800 p-3 sm:p-4 md:p-6 rounded-lg sm:rounded-2xl shadow-2xl">
+          <h3 class="font-bold mb-3 sm:mb-4 text-center">♠️ Dealer</h3>
           <div class="card-deck" id="dealer-cards">
           </div>
           <div class="blackjack-score" id="dealer-score">Score: 0</div>
@@ -309,8 +411,8 @@
         </div>
 
         <!-- يد اللاعب -->
-        <div class="bg-slate-800 p-6 rounded-2xl shadow-2xl">
-          <h3 class="text-2xl font-bold mb-4 text-center">♥️ Player</h3>
+        <div class="bg-slate-800 p-3 sm:p-4 md:p-6 rounded-lg sm:rounded-2xl shadow-2xl">
+          <h3 class="font-bold mb-3 sm:mb-4 text-center">♥️ Player</h3>
           <div class="card-deck" id="player-cards">
           </div>
           <div class="blackjack-score" id="player-score">Score: 0</div>
@@ -319,17 +421,17 @@
       </div>
 
       <!-- أزرار اللعب -->
-      <div class="bg-slate-800 p-6 rounded-2xl shadow-2xl mb-6">
-        <div id="bj-buttons" class="flex flex-wrap gap-4 justify-center">
+      <div class="bg-slate-800 p-3 sm:p-4 md:p-6 rounded-lg sm:rounded-2xl shadow-2xl mb-6 mx-2 sm:mx-0 max-w-4xl sm:max-w-full md:max-w-4xl mx-auto">
+        <div id="bj-buttons" class="button-group">
           <button
             onclick="bjDeal()"
-            class="bg-green-500 hover:bg-green-600 px-6 py-3 rounded-xl font-bold text-lg transition-all hover:scale-105 active:scale-95"
+            class="game-button bg-green-500 hover:bg-green-600 font-bold transition-all hover:scale-105 active:scale-95"
           >
             Deal
           </button>
           <button
             onclick="bjHit()"
-            class="bg-blue-500 hover:bg-blue-600 px-6 py-3 rounded-xl font-bold text-lg transition-all hover:scale-105 active:scale-95 btn-disabled"
+            class="game-button bg-blue-500 hover:bg-blue-600 font-bold transition-all hover:scale-105 active:scale-95 btn-disabled"
             id="bj-hit-btn"
             disabled
           >
@@ -337,7 +439,7 @@
           </button>
           <button
             onclick="bjStand()"
-            class="bg-yellow-600 hover:bg-yellow-700 px-6 py-3 rounded-xl font-bold text-lg transition-all hover:scale-105 active:scale-95 btn-disabled"
+            class="game-button bg-yellow-600 hover:bg-yellow-700 font-bold transition-all hover:scale-105 active:scale-95 btn-disabled"
             id="bj-stand-btn"
             disabled
           >
@@ -345,7 +447,7 @@
           </button>
           <button
             onclick="resetGame('blackjack')"
-            class="bg-red-500 hover:bg-red-600 px-6 py-3 rounded-xl font-bold text-lg transition-all hover:scale-105 active:scale-95"
+            class="game-button bg-red-500 hover:bg-red-600 font-bold transition-all hover:scale-105 active:scale-95"
           >
             New Game
           </button>
@@ -353,17 +455,17 @@
       </div>
 
       <!-- إحصائيات البلاك جاك -->
-      <div class="stats-box p-5 rounded-2xl text-center w-full max-w-sm mx-auto">
-        <h3 class="text-2xl font-bold mb-4">📊 Statistics</h3>
+      <div class="stats-box p-4 sm:p-5 rounded-lg sm:rounded-2xl text-center w-full max-w-sm mx-auto mb-4">
+        <h3 class="text-lg sm:text-2xl font-bold mb-3 sm:mb-4">📊 Statistics</h3>
         <div class="game-info">
-          <p class="text-lg">Wins: <span id="bj-wins" class="text-green-400 font-bold">0</span></p>
-          <p class="text-lg">Losses: <span id="bj-losses" class="text-red-400 font-bold">0</span></p>
-          <p class="text-lg">Draws: <span id="bj-draws" class="text-yellow-400 font-bold">0</span></p>
+          <p class="text-base sm:text-lg">Wins: <span id="bj-wins" class="text-green-400 font-bold">0</span></p>
+          <p class="text-base sm:text-lg">Losses: <span id="bj-losses" class="text-red-400 font-bold">0</span></p>
+          <p class="text-base sm:text-lg">Draws: <span id="bj-draws" class="text-yellow-400 font-bold">0</span></p>
         </div>
       </div>
 
       <!-- رسالة النتيجة -->
-      <h2 id="bj-result" class="text-2xl md:text-4xl font-bold mt-8 text-center text-green-400">
+      <h2 id="bj-result" class="text-lg sm:text-2xl md:text-4xl font-bold mt-4 sm:mt-8 text-center text-green-400">
         Click Deal to Start
       </h2>
     </div>
@@ -603,7 +705,7 @@
       for (let card of hand) {
         const cardDiv = document.createElement('div')
         cardDiv.className = 'small-card'
-        cardDiv.innerHTML = `<img src="${card[2]}" alt="${card[0]}">`
+        cardDiv.innerHTML = `<img src="${card[2]}" alt="${card[0]}" style="display: block; width: 100%; height: 100%; object-fit: cover;">`
         container.appendChild(cardDiv)
       }
     }
@@ -614,13 +716,12 @@
       gameActive = true
 
       displayCards(playerHand, 'player-cards')
-      displayCards([dealerHand[0]], 'dealer-cards') // إخفاء الورقة الثانية
+      displayCards([dealerHand[0]], 'dealer-cards')
 
       const playerScore = calculateScore(playerHand)
       document.getElementById('player-score').innerText = `Score: ${playerScore}`
       document.getElementById('dealer-score').innerText = `Score: ${calculateScore([dealerHand[0]])}`
 
-      // تفعيل أزرار اللعب
       document.getElementById('bj-hit-btn').disabled = false
       document.getElementById('bj-stand-btn').disabled = false
       document.getElementById('bj-hit-btn').classList.remove('btn-disabled')
@@ -630,7 +731,6 @@
       document.getElementById('player-status').innerText = ''
       document.getElementById('dealer-status').innerText = ''
 
-      // التحقق من البلاك جاك
       if (playerScore === 21) {
         bjStand()
       }
@@ -662,12 +762,10 @@
       document.getElementById('bj-hit-btn').classList.add('btn-disabled')
       document.getElementById('bj-stand-btn').classList.add('btn-disabled')
 
-      // إظهار ورقة الديلر
       displayCards(dealerHand, 'dealer-cards')
       let dealerScore = calculateScore(dealerHand)
       document.getElementById('dealer-score').innerText = `Score: ${dealerScore}`
 
-      // الديلر يأخذ ورقات حتى يصل إلى 17 على الأقل
       while (dealerScore < 17) {
         dealerHand.push(dealCard())
         displayCards(dealerHand, 'dealer-cards')
@@ -687,25 +785,21 @@
       if (playerScore > 21) {
         result = '😢 You Bust! Dealer Wins!'
         bjLosses++
-        document.getElementById('bj-result').innerText = result
       } else if (dealerScore > 21) {
         result = '🎉 Dealer Bust! You Win!'
         bjWins++
-        document.getElementById('bj-result').innerText = result
       } else if (playerScore > dealerScore) {
         result = '🎉 You Win!'
         bjWins++
-        document.getElementById('bj-result').innerText = result
       } else if (dealerScore > playerScore) {
         result = '😢 Dealer Wins!'
         bjLosses++
-        document.getElementById('bj-result').innerText = result
       } else {
         result = '🤝 Draw!'
         bjDraws++
-        document.getElementById('bj-result').innerText = result
       }
 
+      document.getElementById('bj-result').innerText = result
       document.getElementById('bj-wins').innerText = bjWins
       document.getElementById('bj-losses').innerText = bjLosses
       document.getElementById('bj-draws').innerText = bjDraws
@@ -742,16 +836,13 @@
 
     // ======================== Tab Switching ========================
     function switchGame(game) {
-      // إخفاء جميع ألعاب
       document.getElementById('highcard-game').classList.remove('active')
       document.getElementById('blackjack-game').classList.remove('active')
 
-      // إزالة active من جميع الأزرار
       document.querySelectorAll('.tab-button').forEach(btn => {
         btn.classList.remove('active')
       })
 
-      // إظهار اللعبة المطلوبة وتفعيل الزر
       if (game === 'highcard') {
         document.getElementById('highcard-game').classList.add('active')
         document.querySelectorAll('.tab-button')[0].classList.add('active')
@@ -761,7 +852,6 @@
       }
     }
 
-    // تهيئة البيانات الأولية
     window.addEventListener('load', () => {
       bjDeck = shuffleDeck(createDeck())
       updateStats()
