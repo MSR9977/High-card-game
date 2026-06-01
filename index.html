@@ -141,6 +141,9 @@
     @media (min-width: 640px) {
       .games-grid { grid-template-columns: 1fr 1fr; }
     }
+    @media (min-width: 1024px) {
+      .games-grid { grid-template-columns: 1fr 1fr 1fr; }
+    }
 
     /* ── GAME CARD ── */
     .game-card {
@@ -196,6 +199,7 @@
       50%      { transform: translateY(-10px); }
     }
     .game-card:nth-child(2) .card-icon { animation-delay: -2s; }
+    .game-card:nth-child(3) .card-icon { animation-delay: -1s; }
 
     .card-title {
       font-family: 'Playfair Display', serif;
@@ -317,7 +321,7 @@
 
   <!-- STATS STRIP -->
   <div class="stats-strip">
-    <div class="stat"><div class="num">2</div><div class="lbl">لعبة احترافية</div></div>
+    <div class="stat"><div class="num">3</div><div class="lbl">لعبة احترافية</div></div>
     <div class="stat"><div class="num">∞</div><div class="lbl">جولات لعب</div></div>
     <div class="stat"><div class="num">100%</div><div class="lbl">متعة بدون توقف</div></div>
   </div>
@@ -362,6 +366,21 @@
         <li>شاشة كاملة بدون سكرول</li>
       </ul>
       <div class="play-btn">💰 العب الآن</div>
+    </a>
+
+    <!-- BACCARAT ROYAL -->
+    <a href="./baccarat-royal.html" class="game-card">
+      <span class="card-icon">👑</span>
+      <div class="card-title">Baccarat Royal</div>
+      <div class="card-desc">باكارات ملكي — اختر بين Player أو Banker أو Tie!</div>
+      <ul class="features">
+        <li>بطاقات حقيقية من أصل 4 رزم</li>
+        <li>ثلاث خيارات رهان (Player, Banker, Tie)</li>
+        <li>قواعد الورقة الثالثة الاحترافية</li>
+        <li>نظام تتبع النتائج التاريخية</li>
+        <li>واجهة ملكية بتصميم احترافي</li>
+      </ul>
+      <div class="play-btn">👑 العب الآن</div>
     </a>
 
   </div>
